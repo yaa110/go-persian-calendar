@@ -6,36 +6,41 @@
 // Package ptime provides functionality for implementation of Persian (Jalali) Calendar.
 package pcalendar
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
-// A PersianMonth specifies a month of the year in Persian calendar starting from 1.
-type PersianMonth int
+// A Month specifies a month of the year in Persian calendar starting from 1.
+type Month int
 
-// A GregorianMonth specifies a month of the year in Gregorian calendar starting from 1.
-type GregorianMonth int
+// A Weekday specifies a day of the week in Persian starting from 0.
+type Weekday int
 
-// A PersianWeekday specifies a day of the week in Persian calendar starting from 0.
-type PersianWeekday int
+// A PersianDate represents a day in Persian (Jalali) Calendar.
+type PersianDate struct {
+	Year int
+	Month Month
+	Day int
+	yearday int
+	weekday Weekday
+}
 
-// A GregorianWeekday specifies a day of the week in Gregorian calendar starting from 0.
-type GregorianWeekday int
+// A PersianDate represents a day in Gregorian Calendar.
+type GregorianDate struct {
+	Year int
+	Month time.Month
+	Day int
+}
 
-// A PersianCalendar represents a day in Persian (Jalali) Calendar.
+// A PersianCalendar provides functionality for conversion of Persian (Jalali) and Gregorian Calendars.
 type PersianCalendar struct {
-	p_year int
-	p_month PersianMonth
-	p_month_day int
-	p_year_day int
-	p_week_day PersianWeekday
-	g_year int
-	g_month GregorianMonth
-	g_month_day int
-	g_year_day int
-	g_week_day GregorianWeekday
+	Persian PersianDate
+	Gregorian GregorianDate
 }
 
 const (
-	Farvardin PersianMonth = 1 + iota
+	Farvardin Month = 1 + iota
 	Ordibehesht
 	Khordad
 	Tir
@@ -50,38 +55,13 @@ const (
 )
 
 const (
-	January GregorianMonth = 1 + iota
-	February
-	March
-	April
-	May
-	June
-	July
-	August
-	September
-	October
-	November
-	December
-)
-
-const (
-	Shanbe PersianWeekday = iota
+	Shanbe Weekday = iota
 	Yekshanbe
 	Doshanbe
 	Seshanbe
 	Chaharshanbe
 	Panjshanbe
 	Jome
-)
-
-const (
-	Saturday GregorianWeekday = iota
-	Sunday
-	Monday
-	Tuesday
-	Wednesday
-	Thursday
-	Friday
 )
 
 const (
@@ -93,7 +73,7 @@ const (
 	month_count_leap_before = 3
 )
 
-var p_months = [...]string{
+var months = [...]string{
 	"فروردین",
 	"اردیبهشت",
 	"خرداد",
@@ -108,22 +88,7 @@ var p_months = [...]string{
 	"اسفند",
 }
 
-var g_months = [...]string{
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December",
-}
-
-var p_days = [...]string{
+var days = [...]string{
 	"شنبه",
 	"یک‌شنبه",
 	"دوشنبه",
@@ -131,16 +96,6 @@ var p_days = [...]string{
 	"چهارشنبه",
 	"پنج‌شنبه",
 	"جمعه",
-}
-
-var g_days = [...]string{
-	"Saturday",
-	"Sunday",
-	"Monday",
-	"Tuesday",
-	"Wednesday",
-	"Thursday",
-	"Friday",
 }
 
 var p_month_count = [...][...]int {
@@ -174,125 +129,99 @@ var g_month_count = [...][...]int {
 }
 
 // Returns the Persian name of the month.
-func (m PersianMonth) String() string {
-	return p_months[m - 1]
-}
-
-// Returns the English name of the month.
-func (m GregorianMonth) String() string {
-	return g_months[m - 1]
+func (m Month) String() string {
+	return months[m - 1]
 }
 
 // Returns the Persian name of the day in week.
-func (d PersianWeekday) String() string {
-	return p_days[d]
+func (d Weekday) String() string {
+	return days[d]
 }
 
-// Returns the English name of the day in week.
-func (d GregorianWeekday) String() string {
-	return g_days[d]
-}
-
-// Returns new instance of PersianCalendar using Persian date.
-func NewPersianDate(year int, month PersianMonth, day int) (PersianCalendar, errors) {
-	err := checkPersianDate(year, month, day)
+// Returns new instance of PersianCalendar using PersianDate.
+func NewPersianDate(date PersianDate) (PersianCalendar, errors) {
+	err := ValidatePersianDate(date)
 	if err != nil {
 		return nil, err
 	}
 
-	gy, gm, gmd, gyd, gwd := toGregorian(year, month, day)
-	pyd := persianYearDay(year, month, day)
+	date.calculateDays()
 
 	return PersianCalendar {
-		year,   month,  day,    pyd,    PersianWeekday(gwd),
-		gy,     gm,     gmd,    gyd,    gwd,
+		date,
+		toGregorian(date),
 	}, nil
 }
 
-// Returns new instance of PersianCalendar using Gregorian date.
-func NewGregorianDate(year int, month GregorianMonth, day int) (PersianCalendar, errors) {
-	err := checkGregorianDate(year, month, day)
+// Returns new instance of PersianCalendar using GregorianDate.
+func NewGregorianDate(date GregorianDate) (PersianCalendar, errors) {
+	err := ValidateGregorianDate(date)
 	if err != nil {
 		return nil, err
 	}
 
-	py, pm, pmd, pyd, pwd := toPersian(year, month, day)
-	gyd := gregorianYearDay(year, month, day)
+	pdate := toPersian(date)
+	pdate.calculateDays()
 
 	return PersianCalendar {
-		py,     pm,     pmd,    pyd,    pwd,
-		year,   month,  day,    gyd,    GregorianWeekday(pwd),
+		pdate,
+		date,
 	}, nil
 }
 
 // Changes the instance of PersianCalendar (pc) using Persian date.
-func (pc PersianCalendar) SetPersianDate(year int, month PersianMonth, day int) errors {
-	err := checkPersianDate(year, month, day)
+func (pc *PersianCalendar) SetPersianDate(date PersianDate) errors {
+	err := ValidatePersianDate(date)
 	if err != nil {
 		return err
 	}
 
-	pc.p_year = year
-	pc.p_month = month
-	pc.p_month_day = day
+	date.calculateDays()
 
-	pc.g_year, pc.g_month, pc.g_month_day, pc.g_year_day, pc.g_week_day = toGregorian(year, month, day)
-	pc.p_year_day = persianYearDay(year, month, day)
-	pc.p_week_day = PersianWeekday(pc.g_week_day)
+	pc.Persian = date
+	pc.Gregorian = toGregorian(date)
 
 	return nil
 }
 
 // Changes the instance of PersianCalendar (pc) using Gregorian date.
-func (pc PersianCalendar) SetGregorianDate(year int, month GregorianMonth, day int) errors {
-	err := checkGregorianDate(year, month, day)
+func (pc *PersianCalendar) SetGregorianDate(date GregorianDate) errors {
+	err := ValidateGregorianDate(date)
 	if err != nil {
 		return err
 	}
 
-	pc.g_year = year
-	pc.g_month = month
-	pc.g_month_day = day
+	pdate := toPersian(date)
+	pdate.calculateDays()
 
-	pc.p_year, pc.p_month, pc.p_month_day, pc.p_year_day, pc.p_week_day = toPersian(year, month, day)
-	pc.g_year_day = gregorianYearDay(year, month, day)
-	pc.g_week_day = GregorianWeekday(pc.p_week_day)
+	pc.Persian = pdate
+	pc.Gregorian = date
 
 	return nil
 }
 
-// Checks Persian date inputs to be a correct day.
-func checkPersianDate(year int, month PersianMonth, day int) errors {
+// Validates the PersianDate to represent a correct day.
+func ValidatePersianDate(date PersianDate) errors {
 	// TODO
 	return nil
 }
 
-// Checks Gregorian date inputs to be a correct day.
-func checkGregorianDate(year int, month GregorianMonth, day int) errors {
+// Validates the GregorianDate to represent a correct day.
+func ValidateGregorianDate(date GregorianDate) errors {
 	// TODO
 	return nil
 }
 
-// Converts Gregorian date to Persian date (year, month, month_day, year_day, week_day)
-func toPersian(year int, month GregorianMonth, day int) (y int, m PersianMonth, md int, yd int, wd PersianWeekday) {
+func toPersian(date GregorianDate) PersianDate {
 	// TODO
-	return
+	return nil
 }
 
-// Converts Persian date to Gregorian date (year, month, month_day, year_day, week_day)
-func toGregorian(year int, month PersianMonth, day int) (y int, m GregorianMonth, md int, yd int, wd GregorianWeekday) {
+func toGregorian(date PersianDate) GregorianDate {
 	// TODO
-	return
+	return nil
 }
 
-// Returns the year day of Persian date.
-func persianYearDay(year int, month PersianMonth, day int) (yd int) {
-	// TODO
-	return
-}
-
-// Returns the year day of Gregorian date.
-func gregorianYearDay(year int, month GregorianMonth, day int) (yd int) {
-	// TODO
-	return
+func (pd *PersianDate) calculateDays() {
+	// TODO set year and week days of pd
 }
