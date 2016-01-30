@@ -9,10 +9,7 @@
 // Package pdate provides functionality for implementation of Persian (Jalali) Calendar.
 package pdate
 
-import (
-	"errors"
-	"time"
-)
+import "time"
 
 // A Month specifies a month of the year in Persian calendar starting from 1.
 type Month int
@@ -134,50 +131,139 @@ func (d Weekday) String() string {
 }
 
 // Returns a new instance of PersianDate.
-func PersianDate(year int, month Month, day int) (PersianDate, errors) {
-	date := PersianDate{year, month, day}
-	return date, date.Validate()
+func PersianDate(year int, month Month, day int) PersianDate {
+	return PersianDate{year, month, day}.normalize()
 }
 
 // Returns a new instance of GregorianDate.
-func GregorianDate(year int, month Month, day int) (GregorianDate, errors) {
-	date := GregorianDate{year, month, day}
-	return date, date.Validate()
+func GregorianDate(year int, month Month, day int) GregorianDate {
+	return GregorianDate{year, month, day}.normalize()
 }
 
-// Validates the date to represent a correct day.
-func (date PersianDate) Validate() errors {
-	// TODO
-	return nil
+// Returns a new instance of PersianDate from unix timestamp.
+// seconds since January 1, 1970 UTC.
+func Unix(seconds int64, location *time.Location) PersianDate {
+	return GregorianDate(time.Unix(seconds, 0).In(location).Date()).PersianDate()
 }
 
-// Validates the date to represent a correct day.
-func (date GregorianDate) Validate() errors {
-	// TODO
-	return nil
+// Returns unix timestamp (the number of seconds) of date.
+func (date PersianDate) Unix(hour, minute, seconds, location *time.Location) int64 {
+	gdate := date.GregorianDate()
+	return time.Date(gdate.year, gdate.month, gdate.day, hour, minute, seconds, 0, location).Unix()
+}
+
+func Now(location *time.Location) PersianDate {
+	return GregorianDate(time.Now().In(location).Date()).PersianDate()
+}
+
+// Returns the year, month, day of date.
+func (date PersianDate) Date() (int, Month, int) {
+	return date.year, date.month, date.day
+}
+
+// Returns the year, month, day of date.
+func (date GregorianDate) Date() (int, time.Month, int) {
+	return date.year, date.month, date.day
+}
+
+// Returns the year of date.
+func (date PersianDate) Year() int {
+	return date.year
+}
+
+// Returns the year of date.
+func (date GregorianDate) Year() int {
+	return date.year
+}
+
+// Returns the month of date.
+func (date PersianDate) Month() Month {
+	return date.month
+}
+
+// Returns the month of date.
+func (date GregorianDate) Month() time.Month {
+	return date.month
+}
+
+// Returns the day in month of date.
+func (date PersianDate) Day() int {
+	return date.day
+}
+
+// Returns the day in month of date.
+func (date GregorianDate) Day() int {
+	return date.day
 }
 
 // Returns the day in year of date.
 func (date PersianDate) YearDay() int {
-	// TODO set year and week days of pd
+	// TODO YearDay of PersianDate
 	return 0
 }
 
 // Returns the weekday of date.
-func (date PersianDate) Weekday() int {
-	// TODO set year and week days of pd
+func (date PersianDate) Weekday() Weekday {
+	// TODO Weekday of PersianDate
 	return 0
 }
 
-func (date GregorianDate) ToPersianDate() (PersianDate, errors) {
+// Returns a new instance of time.Time from date.
+func (date GregorianDate) Time(hours, minutes, seconds, nanoseconds int, location *time.Location) time.Time {
+	return time.Date(date.year, date.month, date.day, hours, minutes, seconds, nanoseconds, location)
+}
+
+// Returns a new instance of time.Time from date.
+func (date PersianDate) Time(hours, minutes, seconds, nanoseconds int, location *time.Location) time.Time {
+	return date.GregorianDate().Time(hours, minutes, seconds, nanoseconds, location)
+}
+
+// Returns a new instance of PersianDate representing the day after or before date.
+func (date PersianDate) Add(days int) PersianDate {
+	return Unix(date.Unix(12, 0, 0, time.UTC) + (days * 86400), time.UTC)
+}
+
+func (date GregorianDate) PersianDate() PersianDate {
 	var year, month, day int
-	// TODO
+	// TODO ToPersianDate
 	return PersianDate(year, month, day)
 }
 
 // Returns the weekday of date.
-func (date PersianDate) ToGregorianDate() (GregorianDate, errors) {
+func (date PersianDate) GregorianDate() GregorianDate {
 	var year, month, day int
-	// TODO
+	// TODO ToGregorianDate
 	return GregorianDate(year, month, day)
+}
+
+// Returns true if the year of date is a leap year.
+func (date PersianDate) IsLeap() bool {
+	return IsPersianLeap(date.year)
+}
+
+// Returns true if the year of date is a leap year.
+func (date GregorianDate) IsLeap() bool {
+	return IsGregorianLeap(date.year)
+}
+
+func IsPersianLeap(year int) bool {
+	// TODO IsPersianLeap
+	return false
+}
+
+func IsGregorianLeap(year int) bool {
+	// TODO IsGregorianLeap
+	return false
+}
+
+// Normalizes the year, month and day if they were outside their usual ranges.
+func (date PersianDate) normalize() PersianDate {
+	// TODO Validate PersianDate
+	return date
+}
+
+// Normalizes the year, month and day if they were outside their usual ranges.
+func (date GregorianDate) normalize() GregorianDate {
+	// TODO Validate GregorianDate
+	return date
 }
