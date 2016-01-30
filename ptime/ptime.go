@@ -1,10 +1,10 @@
 // In the name of Allah
 
+// Persian Calendar v0.1
+// Please visit https://github.com/yaa110/go-persian-calendar for more information.
+//
 // Copyright (c) 2016 Navid Fathollahzade
 // This source code is licensed under MIT license that can be found in the LICENSE file.
-
-// Version: 0.1
-// Please visit https://github.com/yaa110/go-persian-calendar for more information.
 
 // Package ptime provides functionality for implementation of Persian (Jalali) Calendar.
 package ptime
@@ -310,6 +310,10 @@ func (t Time) Add(d time.Duration) Time {
 	return Time(t.Time().Add(d))
 }
 
+func (t Time) AddDate(years, months, days int) Time {
+	return Time(t.Time().AddDate(years, months, days))
+}
+
 // Returns the time.Duration between t and t2
 func (t Time) Diff(t2 Time) time.Duration {
 	return math.Abs(t2.Unix() - t.Unix()) * time.Second
@@ -322,7 +326,19 @@ func (t Time) IsLeap() bool {
 }
 
 // Normalizes the year, month and day if they were outside their usual ranges.
-func (date Time) normalize() Time {
-	// TODO Validate PersianDate
-	return date
+func (t Time) normalize() Time {
+	between(&t.nsec, 0, 999999999)
+	between(&t.sec, 0, 59)
+	between(&t.min, 0, 59)
+	between(&t.hour, 0, 23)
+
+	return t
+}
+
+func between(value *int, min, max int) {
+	if *value < min {
+		*value = min
+	} else if *value > max {
+		*value = max
+	}
 }
