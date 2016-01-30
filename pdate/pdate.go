@@ -1,10 +1,13 @@
 // In the name of Allah
 
-// Copyright (c) 2015 Navid Fathollahzade
+// Copyright (c) 2016 Navid Fathollahzade
 // This source code is licensed under MIT license that can be found in the LICENSE file.
 
-// Package ptime provides functionality for implementation of Persian (Jalali) Calendar.
-package pcalendar
+// Version: 0.1
+// Please visit https://github.com/yaa110/go-persian-calendar for more information.
+
+// Package pdate provides functionality for implementation of Persian (Jalali) Calendar.
+package pdate
 
 import (
 	"errors"
@@ -22,8 +25,6 @@ type PersianDate struct {
 	Year int
 	Month Month
 	Day int
-	yearday int
-	weekday Weekday
 }
 
 // A PersianDate represents a day in Gregorian Calendar.
@@ -31,12 +32,6 @@ type GregorianDate struct {
 	Year int
 	Month time.Month
 	Day int
-}
-
-// A PersianCalendar provides functionality for conversion of Persian (Jalali) and Gregorian Calendars.
-type PersianCalendar struct {
-	Persian PersianDate
-	Gregorian GregorianDate
 }
 
 const (
@@ -138,90 +133,37 @@ func (d Weekday) String() string {
 	return days[d]
 }
 
-// Returns new instance of PersianCalendar using PersianDate.
-func NewPersianDate(date PersianDate) (PersianCalendar, errors) {
-	err := ValidatePersianDate(date)
-	if err != nil {
-		return nil, err
-	}
-
-	date.calculateDays()
-
-	return PersianCalendar {
-		date,
-		toGregorian(date),
-	}, nil
-}
-
-// Returns new instance of PersianCalendar using GregorianDate.
-func NewGregorianDate(date GregorianDate) (PersianCalendar, errors) {
-	err := ValidateGregorianDate(date)
-	if err != nil {
-		return nil, err
-	}
-
-	pdate := toPersian(date)
-	pdate.calculateDays()
-
-	return PersianCalendar {
-		pdate,
-		date,
-	}, nil
-}
-
-// Changes the instance of PersianCalendar (pc) using Persian date.
-func (pc *PersianCalendar) SetPersianDate(date PersianDate) errors {
-	err := ValidatePersianDate(date)
-	if err != nil {
-		return err
-	}
-
-	date.calculateDays()
-
-	pc.Persian = date
-	pc.Gregorian = toGregorian(date)
-
-	return nil
-}
-
-// Changes the instance of PersianCalendar (pc) using Gregorian date.
-func (pc *PersianCalendar) SetGregorianDate(date GregorianDate) errors {
-	err := ValidateGregorianDate(date)
-	if err != nil {
-		return err
-	}
-
-	pdate := toPersian(date)
-	pdate.calculateDays()
-
-	pc.Persian = pdate
-	pc.Gregorian = date
-
-	return nil
-}
-
-// Validates the PersianDate to represent a correct day.
-func ValidatePersianDate(date PersianDate) errors {
+// Validates the date to represent a correct day.
+func (date PersianDate) Validate() errors {
 	// TODO
 	return nil
 }
 
-// Validates the GregorianDate to represent a correct day.
-func ValidateGregorianDate(date GregorianDate) errors {
+// Validates the date to represent a correct day.
+func (date GregorianDate) Validate() errors {
 	// TODO
 	return nil
 }
 
-func toPersian(date GregorianDate) PersianDate {
-	// TODO
-	return nil
-}
-
-func toGregorian(date PersianDate) GregorianDate {
-	// TODO
-	return nil
-}
-
-func (pd *PersianDate) calculateDays() {
+// Returns the day in year of date.
+func (date PersianDate) YearDay() int {
 	// TODO set year and week days of pd
+	return 0
+}
+
+// Returns the weekday of date.
+func (date PersianDate) Weekday() int {
+	// TODO set year and week days of pd
+	return 0
+}
+
+func (date GregorianDate) ToPersianDate() PersianDate {
+	// TODO
+	return nil
+}
+
+// Returns the weekday of date.
+func (date PersianDate) ToGregorianDate() GregorianDate {
+	// TODO
+	return nil
 }
