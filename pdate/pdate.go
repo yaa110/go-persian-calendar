@@ -22,16 +22,16 @@ type Weekday int
 
 // A PersianDate represents a day in Persian (Jalali) Calendar.
 type PersianDate struct {
-	Year int
-	Month Month
-	Day int
+	year int
+	month Month
+	day int
 }
 
 // A PersianDate represents a day in Gregorian Calendar.
 type GregorianDate struct {
-	Year int
-	Month time.Month
-	Day int
+	year int
+	month time.Month
+	day int
 }
 
 const (
@@ -133,6 +133,18 @@ func (d Weekday) String() string {
 	return days[d]
 }
 
+// Returns a new instance of PersianDate.
+func PersianDate(year int, month Month, day int) (PersianDate, errors) {
+	date := PersianDate{year, month, day}
+	return date, date.Validate()
+}
+
+// Returns a new instance of GregorianDate.
+func GregorianDate(year int, month Month, day int) (GregorianDate, errors) {
+	date := GregorianDate{year, month, day}
+	return date, date.Validate()
+}
+
 // Validates the date to represent a correct day.
 func (date PersianDate) Validate() errors {
 	// TODO
@@ -157,13 +169,15 @@ func (date PersianDate) Weekday() int {
 	return 0
 }
 
-func (date GregorianDate) ToPersianDate() PersianDate {
+func (date GregorianDate) ToPersianDate() (PersianDate, errors) {
+	var year, month, day int
 	// TODO
-	return nil
+	return PersianDate(year, month, day)
 }
 
 // Returns the weekday of date.
-func (date PersianDate) ToGregorianDate() GregorianDate {
+func (date PersianDate) ToGregorianDate() (GregorianDate, errors) {
+	var year, month, day int
 	// TODO
-	return nil
+	return GregorianDate(year, month, day)
 }
