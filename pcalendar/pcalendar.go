@@ -27,7 +27,6 @@ type PersianCalendar struct {
 	p_month_day int
 	p_year_day int
 	p_week_day PersianWeekday
-
 	g_year int
 	g_month GregorianMonth
 	g_month_day int
@@ -194,6 +193,72 @@ func (d GregorianWeekday) String() string {
 	return g_days[d]
 }
 
-func NewGregorian(year int, month GregorianMonth, day int) errors {
-	
+// Returns new instance of PersianCalendar using Persian date.
+func NewFromPersianDate(year int, month PersianMonth, day int) (PersianCalendar, errors) {
+	err := checkPersianDate(year, month, day)
+	if err != nil {
+		return nil, err
+	}
+
+	gy, gm, gmd, gyd, gwd := toGregorian(year, month, day)
+	pyd, pwd := calculatePersianDays(month, day)
+
+	return PersianCalendar {
+		year,   month,  day,    pyd,    pwd,
+		gy,     gm,     gmd,    gyd,    gwd,
+	}, nil
+}
+
+// Returns new instance of PersianCalendar using Gregorian date.
+func NewFromGregorianDate(year int, month GregorianMonth, day int) (PersianCalendar, errors) {
+	// TODO
+	return nil, nil
+}
+
+// Changes an instance of PersianCalendar using Persian date.
+func (pc PersianCalendar) SetPersianDate(year int, month PersianMonth, day int) errors {
+	// TODO
+	return nil
+}
+
+// Changes an instance of PersianCalendar using Gregorian date.
+func (pc PersianCalendar) SetGregorianDate(year int, month GregorianMonth, day int) errors {
+	// TODO
+	return nil
+}
+
+// Checks Persian date inputs to be a correct day.
+func checkPersianDate(year int, month PersianMonth, day int) errors {
+	// TODO
+	return nil
+}
+
+// Checks Gregorian date inputs to be a correct day.
+func checkGregorianDate(year int, month GregorianMonth, day int) errors {
+	// TODO
+	return nil
+}
+
+// Converts Gregorian date to Persian date (year, month, month_day, year_day, week_day)
+func toPersian(year int, month GregorianMonth, day int) (y int, m PersianMonth, md int, yd int, wd PersianWeekday) {
+	// TODO
+	return
+}
+
+// Converts Persian date to Gregorian date (year, month, month_day, year_day, week_day)
+func toGregorian(year int, month PersianMonth, day int) (y int, m GregorianMonth, md int, yd int, wd GregorianWeekday) {
+	// TODO
+	return
+}
+
+// Calculates the year day and weekday of Persian date.
+func calculatePersianDays(month PersianMonth, day int) (yd int, wd PersianWeekday) {
+	// TODO
+	return
+}
+
+// Calculates the year day and weekday of Gregorian date.
+func calculateGregorianDays(month PersianMonth, day int) (yd int, wd GregorianWeekday) {
+	// TODO
+	return
 }
