@@ -194,36 +194,70 @@ func (d GregorianWeekday) String() string {
 }
 
 // Returns new instance of PersianCalendar using Persian date.
-func NewFromPersianDate(year int, month PersianMonth, day int) (PersianCalendar, errors) {
+func NewPersianDate(year int, month PersianMonth, day int) (PersianCalendar, errors) {
 	err := checkPersianDate(year, month, day)
 	if err != nil {
 		return nil, err
 	}
 
 	gy, gm, gmd, gyd, gwd := toGregorian(year, month, day)
-	pyd, pwd := calculatePersianDays(month, day)
+	pyd := persianYearDay(year, month, day)
 
 	return PersianCalendar {
-		year,   month,  day,    pyd,    pwd,
+		year,   month,  day,    pyd,    PersianWeekday(gwd),
 		gy,     gm,     gmd,    gyd,    gwd,
 	}, nil
 }
 
 // Returns new instance of PersianCalendar using Gregorian date.
-func NewFromGregorianDate(year int, month GregorianMonth, day int) (PersianCalendar, errors) {
-	// TODO
-	return nil, nil
+func NewGregorianDate(year int, month GregorianMonth, day int) (PersianCalendar, errors) {
+	err := checkGregorianDate(year, month, day)
+	if err != nil {
+		return nil, err
+	}
+
+	py, pm, pmd, pyd, pwd := toPersian(year, month, day)
+	gyd := gregorianYearDay(year, month, day)
+
+	return PersianCalendar {
+		py,     pm,     pmd,    pyd,    pwd,
+		year,   month,  day,    gyd,    GregorianWeekday(pwd),
+	}, nil
 }
 
-// Changes an instance of PersianCalendar using Persian date.
+// Changes the instance of PersianCalendar (pc) using Persian date.
 func (pc PersianCalendar) SetPersianDate(year int, month PersianMonth, day int) errors {
-	// TODO
+	err := checkPersianDate(year, month, day)
+	if err != nil {
+		return err
+	}
+
+	pc.p_year = year
+	pc.p_month = month
+	pc.p_month_day = day
+
+	pc.g_year, pc.g_month, pc.g_month_day, pc.g_year_day, pc.g_week_day = toGregorian(year, month, day)
+	pc.p_year_day = persianYearDay(year, month, day)
+	pc.p_week_day = PersianWeekday(pc.g_week_day)
+
 	return nil
 }
 
-// Changes an instance of PersianCalendar using Gregorian date.
+// Changes the instance of PersianCalendar (pc) using Gregorian date.
 func (pc PersianCalendar) SetGregorianDate(year int, month GregorianMonth, day int) errors {
-	// TODO
+	err := checkGregorianDate(year, month, day)
+	if err != nil {
+		return err
+	}
+
+	pc.g_year = year
+	pc.g_month = month
+	pc.g_month_day = day
+
+	pc.p_year, pc.p_month, pc.p_month_day, pc.p_year_day, pc.p_week_day = toPersian(year, month, day)
+	pc.g_year_day = gregorianYearDay(year, month, day)
+	pc.g_week_day = GregorianWeekday(pc.p_week_day)
+
 	return nil
 }
 
@@ -251,14 +285,14 @@ func toGregorian(year int, month PersianMonth, day int) (y int, m GregorianMonth
 	return
 }
 
-// Calculates the year day and weekday of Persian date.
-func calculatePersianDays(month PersianMonth, day int) (yd int, wd PersianWeekday) {
+// Returns the year day of Persian date.
+func persianYearDay(year int, month PersianMonth, day int) (yd int) {
 	// TODO
 	return
 }
 
-// Calculates the year day and weekday of Gregorian date.
-func calculateGregorianDays(month PersianMonth, day int) (yd int, wd GregorianWeekday) {
+// Returns the year day of Gregorian date.
+func gregorianYearDay(year int, month GregorianMonth, day int) (yd int) {
 	// TODO
 	return
 }
