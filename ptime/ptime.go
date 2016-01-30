@@ -9,7 +9,10 @@
 // Package ptime provides functionality for implementation of Persian (Jalali) Calendar.
 package ptime
 
-import "time"
+import (
+	"time"
+	"math"
+)
 
 // A Month specifies a month of the year in Persian calendar starting from 1.
 type Month int
@@ -222,7 +225,7 @@ func (t Time) Location() *time.Location {
 	return t.loc
 }
 
-// Returns the day in year of t.
+// Returns the day in the year of t.
 func (t Time) YearDay() int {
 	// TODO YearDay of PersianDate
 	return 0
@@ -234,18 +237,87 @@ func (t Time) Weekday() Weekday {
 	return 0
 }
 
+// Returns the number of remaining days in the year of t.
+func (t Time) RYearDay() int {
+	// TODO RYearDay
+	return 0
+}
+
+// Returns the number of remaining days in the month of t.
+func (t Time) RMonthDay() int {
+	// TODO RMonthDay
+	return 0
+}
+
+// Returns the number of remaining days in the week of t.
+func (t Time) RWeekday() int {
+	// TODO RWeekday
+	return 0
+}
+
+func (t Time) FirstDayInWeek() Time {
+	// TODO return the first day in the week
+	return nil
+}
+
+func (t Time) FirstDayInMonth() Time {
+	// TODO return the first day in the month
+	return nil
+}
+
+func (t Time) FirstDayInYear() Time {
+	// TODO return the first day in the year
+	return nil
+}
+
+func (t Time) LastDayInWeek() Time {
+	// TODO return the last day in the week
+	return nil
+}
+
+func (t Time) LastDayInMonth() Time {
+	// TODO return the last day in the month
+	return nil
+}
+
+func (t Time) LastDayInYear() Time {
+	// TODO return the last day in the year
+	return nil
+}
+
+func (t Time) MonthWeek() int {
+	// TODO return the week number in the month
+	return 0
+}
+
+func (t Time) YearWeek() int {
+	// TODO return the week number in the year
+	return 0
+}
+
+func (t Time) Yesterday() int {
+	// TODO return Yesterday
+	return 0
+}
+
+func (t Time) Tomorrow() int {
+	// TODO return Tomorrow
+	return 0
+}
+
 // Returns a new instance of Time for t+d.
 func (t Time) Add(d time.Duration) Time {
 	return Time(t.Time().Add(d))
 }
 
-// Returns true if the year of t is a leap year.
-func (t Time) IsLeap() bool {
-	return IsLeap(t.year)
+// Returns the time.Duration between t and t2
+func (t Time) Diff(t2 Time) time.Duration {
+	return math.Abs(t2.Unix() - t.Unix()) * time.Second
 }
 
-func IsLeap(year int) bool {
-	// TODO IsPersianLeap
+// Returns true if the year of t is a leap year.
+func (t Time) IsLeap() bool {
+	// TODO IsLeap
 	return false
 }
 
