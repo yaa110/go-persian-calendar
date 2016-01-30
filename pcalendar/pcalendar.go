@@ -4,7 +4,7 @@
 // This source code is licensed under MIT license that can be found in the LICENSE file.
 
 // Package ptime provides functionality for implementation of Persian (Jalali) Calendar.
-package ptime
+package pcalendar
 
 import "errors"
 
@@ -20,13 +20,19 @@ type PersianWeekday int
 // A GregorianWeekday specifies a day of the week in Gregorian calendar starting from 0.
 type GregorianWeekday int
 
-// A PersianTime extends time.Time to support Persian (Jalali) Calendar.
-type PersianTime struct {
+// A PersianCalendar represents a day in Persian (Jalali) Calendar.
+type PersianCalendar struct {
 	p_year int
 	p_month PersianMonth
 	p_month_day int
 	p_year_day int
 	p_week_day PersianWeekday
+
+	g_year int
+	g_month GregorianMonth
+	g_month_day int
+	g_year_day int
+	g_week_day GregorianWeekday
 }
 
 const (
@@ -188,6 +194,6 @@ func (d GregorianWeekday) String() string {
 	return g_days[d]
 }
 
-func NewGregorian(year int, )  {
+func NewGregorian(year int, month GregorianMonth, day int) errors {
 	
 }
