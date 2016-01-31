@@ -21,7 +21,7 @@ import (
 )
 ```
 
-1- Convert Gregorian calendar to Persian calendar
+2- Convert Gregorian calendar to Persian calendar
 
 ```go
 // Create a new instance of time.Time
@@ -34,7 +34,7 @@ pt := ptime.New(t)
 fmt.Println(pt.Date()) // output: 1394 دی 11
 ```
 
-1- Convert Persian calendar to Gregorian calendar
+3- Convert Persian calendar to Gregorian calendar
 
 ```go
 // Create a new instance of ptime.Time
@@ -47,7 +47,7 @@ t := pt.Time()
 fmt.Println(t.Date()) // output: 2015 September 24
 ```
 
-1- Get current time
+4- Get current time
 
 ```go
 // Get a new instance of ptime.Time representing current time
@@ -70,7 +70,7 @@ fmt.Println(pt.Weekday()) // output: یکشنبه
 fmt.Println(pt.Tomorrow().Weekday()) // output: دوشنبه
 ```
 
-1- Format the time
+5- Format the time
 
 ```go
 // Get a new instance of ptime.Time using Unix timestamp
