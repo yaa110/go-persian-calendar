@@ -34,6 +34,11 @@ type dateConversion struct {
 	gregorian gdate
 }
 
+type dayFunctions struct {
+	day1 pdate
+	day2 pdate
+}
+
 var month_persian_names = []pMonthName {
 	{Farvardin, "فروردین"},
 	{Ordibehesht, "اردیبهشت"},
@@ -113,6 +118,25 @@ var date_conversions = []dateConversion {
 	},
 }
 
+var day_functions = []dayFunctions{
+	{
+		pdate{1394, Tir, 31},
+		pdate{1394, Mordad, 1},
+	},
+	{
+		pdate{1394, Esfand, 29},
+		pdate{1395, Farvardin, 1},
+	},
+	{
+		pdate{1395, Esfand, 29},
+		pdate{1395, Esfand, 30},
+	},
+	{
+		pdate{1395, Ordibehesht, 12},
+		pdate{1395, Ordibehesht, 13},
+	},
+}
+
 func TestPersianMonthName(t *testing.T)  {
 	for _, p := range month_persian_names {
 		if p.month.String() != p.name {
@@ -158,7 +182,7 @@ func TestAmPmShortName(t *testing.T)  {
 }
 
 func TestLocations(t *testing.T) {
-	if (Iran.String() != "Asia/Tehran") {
+	if Iran.String() != "Asia/Tehran" {
 		t.Error(
 			"For", "Iran",
 			"expected", "Asia/Tehran",
@@ -166,7 +190,7 @@ func TestLocations(t *testing.T) {
 		)
 	}
 
-	if (Afghanistan.String() != "Asia/Kabul") {
+	if Afghanistan.String() != "Asia/Kabul" {
 		t.Error(
 			"For", "Afghanistan",
 			"expected", "Asia/Kabul",
@@ -179,7 +203,7 @@ func TestPersianToGregorian(t *testing.T) {
 	for _, p := range date_conversions {
 		gt := Date(p.persian.year, p.persian.month, p.persian.day, 11, 59, 59, 0, Iran).Time()
 
-		if (gt.Year() != p.gregorian.year || gt.Month() != p.gregorian.month || gt.Day() != p.gregorian.day) {
+		if gt.Year() != p.gregorian.year || gt.Month() != p.gregorian.month || gt.Day() != p.gregorian.day {
 			t.Error(
 				"For", fmt.Sprintf("%d %s %d", p.persian.year, p.persian.month.String(), p.persian.day),
 				"expected", fmt.Sprintf("%d %s %d", p.gregorian.year, p.gregorian.month.String(), p.gregorian.day),
@@ -193,7 +217,7 @@ func TestGregorianToPersian(t *testing.T) {
 	for _, p := range date_conversions {
 		pt := New(time.Date(p.gregorian.year, p.gregorian.month, p.gregorian.day, 11, 59, 59, 0, Iran))
 
-		if (pt.Year() != p.persian.year || pt.Month() != p.persian.month || pt.Day() != p.persian.day) {
+		if pt.Year() != p.persian.year || pt.Month() != p.persian.month || pt.Day() != p.persian.day {
 			t.Error(
 				"For", fmt.Sprintf("%d %s %d", p.gregorian.year, p.gregorian.month.String(), p.gregorian.day),
 				"expected", fmt.Sprintf("%d %s %d", p.persian.year, p.persian.month.String(), p.persian.day),
@@ -220,10 +244,38 @@ func TestFromUnixTimeStamp(t *testing.T) {
 
 	fu := Unix(tu, int64(now.Nanosecond()), Iran)
 
-	if (fu.String() != now.String()) {
+	if fu.String() != now.String() {
 		t.Error(
 			"Expected", now.String(),
 			"got", fu.String(),
 		)
+	}
+}
+
+func TestYesterday(t *testing.T) {
+	for _, p := range day_functions {
+		day := Date(p.day2.year, p.day2.month, p.day2.day, 12, 59, 59, 0, Iran)
+		yesterday := day.Yesterday()
+		if yesterday.Year() != p.day1.year || yesterday.Month() != p.day1.month || yesterday.Day() != p.day1.day {
+			t.Error(
+				"For", fmt.Sprintf("%d %s %d", p.day2.year, p.day2.month.String(), p.day2.day),
+				"expected", fmt.Sprintf("%d %s %d", p.day1.year, p.day1.month.String(), p.day1.day),
+				"got", fmt.Sprintf("%d %s %d", yesterday.Year(), yesterday.Month().String(), yesterday.Day()),
+			)
+		}
+	}
+}
+
+func TestTomorrow(t *testing.T) {
+	for _, p := range day_functions {
+		day := Date(p.day1.year, p.day1.month, p.day1.day, 12, 59, 59, 0, Iran)
+		tomorrow := day.Tomorrow()
+		if tomorrow.Year() != p.day2.year || tomorrow.Month() != p.day2.month || tomorrow.Day() != p.day2.day {
+			t.Error(
+				"For", fmt.Sprintf("%d %s %d", p.day1.year, p.day1.month.String(), p.day1.day),
+				"expected", fmt.Sprintf("%d %s %d", p.day2.year, p.day2.month.String(), p.day2.day),
+				"got", fmt.Sprintf("%d %s %d", tomorrow.Year(), tomorrow.Month().String(), tomorrow.Day()),
+			)
+		}
 	}
 }
