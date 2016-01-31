@@ -538,7 +538,7 @@ func (t Time) FirstWeekDay() Time {
 		return t
 	}
 
-	return t.AddDate(0, 0, int(Shanbeh -t.wday))
+	return t.AddDate(0, 0, int(Shanbeh-t.wday))
 }
 
 // Returns a new instance of Time representing the last day of the week of t.
