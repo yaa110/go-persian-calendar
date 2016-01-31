@@ -202,7 +202,9 @@ func (a AM_PM) Short() string {
 }
 
 // Converts Gregorian calendar to Persian calendar and
+//
 // returns a new instance of Time corresponding to the time of t.
+//
 // t is an instance of time.Time in Gregorian calendar.
 func New(t time.Time) Time {
 	pt := new(Time)
@@ -245,8 +247,11 @@ func (t Time) Time() time.Time {
 }
 
 // Returns a new instance of Time.
+//
 // year, month and day represent a day in Persian calendar.
+//
 // hour, min minute, sec seconds, nsec nanoseconds offsets represent a moment in time.
+//
 // loc is a pointer to time.Location and must not be nil.
 func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Location) Time {
 	if loc == nil {
@@ -260,7 +265,9 @@ func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Locati
 }
 
 // Returns a new instance of PersianDate from unix timestamp.
+//
 // sec seconds and nsec nanoseconds since January 1, 1970 UTC.
+//
 // loc is a pointer to time.Location and must not be nil.
 func Unix(sec, nsec int64, loc *time.Location) Time {
 	if loc == nil {
@@ -271,6 +278,7 @@ func Unix(sec, nsec int64, loc *time.Location) Time {
 }
 
 // Returns a new instance of Time corresponding to the current time.
+//
 // loc is a pointer to time.Location and must not be nil.
 func Now(loc *time.Location) Time {
 	if loc == nil {
@@ -333,7 +341,9 @@ func (pt *Time) SetTime(t time.Time) {
 }
 
 // Sets t to represent the corresponding unix timestamp of
+//
 // sec seconds and nsec nanoseconds since January 1, 1970 UTC.
+//
 // loc is a pointer to time.Location and must not be nil.
 func (t *Time) SetUnix(sec, nsec int64, loc *time.Location) {
 	if loc == nil {
@@ -344,8 +354,11 @@ func (t *Time) SetUnix(sec, nsec int64, loc *time.Location) {
 }
 
 // Sets t.
+//
 // year, month and day represent a day in Persian calendar.
+//
 // hour, min minute, sec seconds, nsec nanoseconds offsets represent a moment in time.
+//
 // loc is a pointer to time.Location and must not be nil.
 func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *time.Location) {
 	if loc == nil {
@@ -412,6 +425,7 @@ func (t *Time) SetNanosecond(nsec int) {
 }
 
 // Sets the location of t.
+//
 // loc is a pointer to time.Location and must not be nil.
 func (t *Time) In(loc *time.Location) {
 	if loc == nil {
@@ -678,41 +692,42 @@ func (t Time) ZoneOffset() string {
 }
 
 // Returns the formatted representation of t.
-// yyyy, yyy, y     year (e.g. 1394)
-// yy               2-digits representation of year (e.g. 94)
-// MMM              the Persian name of month (e.g. فروردین)
-// MMI              the Dari name of month (e.g. حمل)
-// MM               2-digits representation of month (e.g. 01)
-// M                month (e.g. 1)
-// rw               remaining weeks of year
-// w                week of year
-// RW               remaining weeks of month
-// W                week of month
-// RD               remaining days of year
-// D                day of year
-// rd               remaining days of month
-// dd               2-digits representation of day (e.g. 01)
-// d                day (e.g. 1)
-// E                the Persian name of weekday (e.g. شنبه)
-// e                the Persian short name of weekday (e.g. ش)
-// A                the Persian name of 12-Hour marker (e.g. قبل از ظهر)
-// a                the Persian short name of 12-Hour marker (e.g. ق.ظ)
-// HH               2-digits representation of hour [00-23]
-// H                hour [0-23]
-// kk               2-digits representation of hour [01-24]
-// k                hour [1-24]
-// hh               2-digits representation of hour [01-12]
-// h                hour [1-12]
-// KK               2-digits representation of hour [00-11]
-// K                hour [0-11]
-// mm               2-digits representation of minute [00-59]
-// m                minute [0-59]
-// ss               2-digits representation of seconds [00-59]
-// s                seconds [0-59]
-// ns               nanoseconds
-// S                3-digits representation of milliseconds (e.g. 001)
-// z                the name of location
-// Z                zone offset (e.g. +03:30)
+//
+//		yyyy, yyy, y     year (e.g. 1394)
+//		yy               2-digits representation of year (e.g. 94)
+//		MMM              the Persian name of month (e.g. فروردین)
+//		MMI              the Dari name of month (e.g. حمل)
+//		MM               2-digits representation of month (e.g. 01)
+//		M                month (e.g. 1)
+//		rw               remaining weeks of year
+//		w                week of year
+//		RW               remaining weeks of month
+//		W                week of month
+//		RD               remaining days of year
+//		D                day of year
+//		rd               remaining days of month
+//		dd               2-digits representation of day (e.g. 01)
+//		d                day (e.g. 1)
+//		E                the Persian name of weekday (e.g. شنبه)
+//		e                the Persian short name of weekday (e.g. ش)
+//		A                the Persian name of 12-Hour marker (e.g. قبل از ظهر)
+//		a                the Persian short name of 12-Hour marker (e.g. ق.ظ)
+//		HH               2-digits representation of hour [00-23]
+//		H                hour [0-23]
+//		kk               2-digits representation of hour [01-24]
+//		k                hour [1-24]
+//		hh               2-digits representation of hour [01-12]
+//		h                hour [1-12]
+//		KK               2-digits representation of hour [00-11]
+//		K                hour [0-11]
+//		mm               2-digits representation of minute [00-59]
+//		m                minute [0-59]
+//		ss               2-digits representation of seconds [00-59]
+//		s                seconds [0-59]
+//		ns               nanoseconds
+//		S                3-digits representation of milliseconds (e.g. 001)
+//		z                the name of location
+//		Z                zone offset (e.g. +03:30)
 func (t Time) Format(format string) string {
 	r := strings.NewReplacer(
 		"yyyy", strconv.Itoa(t.year),
