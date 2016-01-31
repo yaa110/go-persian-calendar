@@ -52,21 +52,12 @@ const (
 	Yekshanbe
 	Doshanbe
 	Seshanbe
-	Chaharshanbe
+	Charshanbe
 	Panjshanbe
 	Jome
 )
 
-const (
-	persian_epoch = 226899
-
-	month_count_normal = 0
-	month_count_leap = 1
-	month_count_normal_before = 2
-	month_count_leap_before = 3
-)
-
-var months = [...]string{
+var months = [12]string{
 	"فروردین",
 	"اردیبهشت",
 	"خرداد",
@@ -81,7 +72,7 @@ var months = [...]string{
 	"اسفند",
 }
 
-var days = [...]string{
+var days = [7]string{
 	"شنبه",
 	"یک‌شنبه",
 	"دوشنبه",
@@ -91,34 +82,20 @@ var days = [...]string{
 	"جمعه",
 }
 
-var p_month_count = [...][...]int {
-	{31,     31,      0},       // Farvardin
-	{31,     31,      31},      // Ordibehesht
-	{31,     31,      62},      // Khordad
-	{31,     31,      93},      // Tir
-	{31,     31,      124},     // Mordad
-	{31,     31,      155},     // Shahrivar
-	{30,     30,      186},     // Mehr
-	{30,     30,      216},     // Aban
-	{30,     30,      246},     // Azar
-	{30,     30,      276},     // Dey
-	{30,     30,      306},     // Bahman
-	{29,     30,      336},     // Esfand
-}
-
-var g_month_count = [...][...]int {
-	{31,     31,      0,        0},       // Jan
-	{28,     29,      31,       31},      // Feb
-	{31,     31,      59,       60},      // Mar
-	{30,     30,      90,       91},      // Apr
-	{31,     31,      120,      121},     // May
-	{30,     30,      151,      152},     // Jun
-	{31,     31,      181,      182},     // Jul
-	{31,     31,      212,      213},     // Aug
-	{30,     30,      243,      244},     // Sep
-	{31,     31,      273,      274},     // Oct
-	{30,     30,      304,      305},     // Nov
-	{31,     31,      334,      335},     // Dec
+//  {days,   leap_days}
+var p_month_count = [12][2]int {
+	{31,     31},     // Farvardin
+	{31,     31},     // Ordibehesht
+	{31,     31},     // Khordad
+	{31,     31},     // Tir
+	{31,     31},     // Mordad
+	{31,     31},     // Shahrivar
+	{30,     30},     // Mehr
+	{30,     30},     // Aban
+	{30,     30},     // Azar
+	{30,     30},     // Dey
+	{30,     30},     // Bahman
+	{29,     30},     // Esfand
 }
 
 // Returns the Persian name of the month.
@@ -132,14 +109,43 @@ func (d Weekday) String() string {
 }
 
 func Time(t time.Time) Time {
-	// TODO convert time.Time (Gregorian) to Persian Time
-	return nil
+	pt := Time{}
+	&pt.SetTime(t)
+
+	return pt
 }
 
-// Returns a new instance of time.Time from t.
+// Converts Persian date to Gregorian date and returns an instance of time.Time
 func (t Time) Time() time.Time {
-	// TODO convert Persian date to time.Time (Gregorian)
-	return nil
+	var year, month, day int
+
+	jdn := getJdn(t.year, t.month, t.day)
+
+	if jdn > 2299160 {
+		l := jdn + 68569
+		n := 4 * l / 146097
+		l = l - (146097 * n + 3) / 4
+		i := 4000 * (l + 1) / 1461001
+		l = l - 1461 * i / 4 + 31
+		j := 80 * l / 2447
+		day = l - 2447 * j / 80
+		l = j / 11
+		month = j + 2 - 12 * l
+		year = 100 * (n - 49) + i + l
+	} else {
+		j := jdn + 1402
+		k := (j - 1) / 1461
+		l := j - 1461 * k
+		n := (l - 1) / 365 - l / 1461
+		i := l - 365 * n + 30
+		j = 80 * i / 2447
+		day = i - 2447 * j / 80
+		i = j / 11
+		month = j + 2 - 12 * i
+		year = 4 * k + n + i - 4716
+	}
+
+	return time.Date(year, month, day, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
 // Returns a new instance of PersianDate.
@@ -148,7 +154,10 @@ func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Locati
 		panic("ptime: the Location must not be nil in call to Date")
 	}
 
-	return Time{year, month, day, hour, min, sec, nsec, loc}.normalize()
+	t := Time{year, month, day, hour, min, sec, nsec, loc}
+	&t.norm()
+
+	return t
 }
 
 // Returns a new instance of PersianDate from unix timestamp.
@@ -161,6 +170,146 @@ func Unix(sec, nsec int64, loc *time.Location) Time {
 	return Time(time.Unix(sec, nsec).In(loc))
 }
 
+func Now(loc *time.Location) Time {
+	if loc == nil {
+		panic("ptime: the Location must not be nil in call to Now")
+	}
+
+	return Time(time.Now().In(loc))
+}
+
+// Converts Gregorian date to Persian date.
+// TODO has bug
+func (pt *Time) SetTime(t time.Time) {
+	var year, month, day int
+
+	pt.nsec = t.Nanosecond()
+	pt.sec = t.Second()
+	pt.min = t.Minute()
+	pt.hour = t.Hour()
+	pt.loc = t.Location()
+
+	var jdn int
+	gy, gm, gd := t.Date()
+
+	if gy > 1582 || (gy == 1582 && gm > 10) || (gy == 1582 && gm == 10 && gd > 14) {
+		jdn = ((1461 * (gy + 4800 + ((gm - 14) / 12))) / 4) + ((367 * (gm - 2 - 12 * (((gm - 14) / 12)))) / 12) - ((3 * (((gy + 4900 + ((gm - 14) / 12)) / 100))) / 4) + gd - 32075
+	} else {
+		jdn = 367 * gy - ((7 * (gy + 5001 + ((gm - 9) / 7))) / 4) + ((275 * gm) / 9) + gd + 1729777
+	}
+
+	dep := jdn - getJdn(475, 1, 1)
+	cyc := dep / 1029983
+	rem := dep % 1029983
+
+	var ycyc int
+	if rem == 1029982 {
+		ycyc = 2820
+	} else {
+		a := rem / 366
+		ycyc = (2134 * a + 2816 * (rem % 366) + 2815) / 1028522 + a + 1;
+	}
+
+	year = ycyc + 2820 * cyc + 474
+	if year <= 0 {
+		year = year - 1
+	}
+
+	var dy float64 = float64(jdn - getJdn(year, 1, 1) + 1)
+	if dy <= 186 {
+		month = int(math.Ceil(dy / 31.0))
+	} else {
+		month = int(math.Ceil((dy - 6) / 30.0))
+	}
+
+	day = jdn - getJdn(year, month, 1) + 1
+
+	pt.year = year
+	pt.month = month
+	pt.day = day
+}
+
+// Changes t using unix timestamp
+func (t *Time) SetUnix(sec, nsec int64, loc *time.Location) {
+	if loc == nil {
+		panic("ptime: the Location must not be nil in call to SetUnix")
+	}
+
+	t.SetTime(time.Unix(sec, nsec).In(loc))
+}
+
+func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *time.Location) {
+	if loc == nil {
+		panic("ptime: the Location must not be nil in call to Change")
+	}
+
+	t.year = year
+	t.month = month
+	t.day = day
+	t.hour = hour
+	t.min = min
+	t.sec = sec
+	t.nsec = nsec
+	t.loc = loc
+
+	t.norm()
+}
+
+func (t *Time) SetYear(year int) {
+	t.year = year
+	norm_day(t)
+}
+
+func (t *Time) SetMonth(month Month) {
+	t.month = month
+	norm_month(t)
+	norm_day(t)
+}
+
+func (t *Time) SetDay(day int) {
+	t.day = day
+	norm_day(t)
+}
+
+func (t *Time) SetHour(hour int) {
+	t.hour = hour
+	norm_hour(t)
+}
+
+func (t *Time) SetMinute(min int) {
+	t.min = min
+	norm_minute(t)
+}
+
+func (t *Time) SetSecond(sec int) {
+	t.sec = sec
+	norm_second(t)
+}
+
+func (t *Time) SetNanosecond(nsec int) {
+	t.nsec = nsec
+	norm_nanosecond(t)
+}
+
+func (t *Time) In(loc *time.Location) {
+	if loc == nil {
+		panic("ptime: the Location must not be nil in call to In")
+	}
+
+	t.loc = loc
+}
+
+func (t *Time) At(hour, min, sec, nsec int) {
+	t.hour = hour
+	t.min = min
+	t.sec = sec
+	t.nsec = nsec
+	norm_hour(t)
+	norm_minute(t)
+	norm_second(t)
+	norm_nanosecond(t)
+}
+
 // Returns unix timestamp (the number of seconds) of t.
 func (t Time) Unix() int64 {
 	return t.Time().Unix()
@@ -169,14 +318,6 @@ func (t Time) Unix() int64 {
 // Returns unix timestamp (the number of nanoseconds) of t.
 func (t Time) UnixNano() int64 {
 	return t.Time().UnixNano()
-}
-
-func Now(loc *time.Location) Time {
-	if loc == nil {
-		panic("ptime: the Location must not be nil in call to Now")
-	}
-
-	return Time(time.Now().In(loc))
 }
 
 // Returns the year, month, day of t.
@@ -315,24 +456,51 @@ func (t Time) AddDate(years, months, days int) Time {
 }
 
 // Returns the time.Duration between t and t2
-func (t Time) Diff(t2 Time) time.Duration {
+func (t Time) Since(t2 Time) time.Duration {
 	return math.Abs(t2.Unix() - t.Unix()) * time.Second
 }
 
 // Returns true if the year of t is a leap year.
 func (t Time) IsLeap() bool {
-	// TODO IsLeap
-	return false
+	return divider(25 * t.year + 11, 33) < 8
 }
 
-// Normalizes the year, month and day if they were outside their usual ranges.
-func (t Time) normalize() Time {
-	between(&t.nsec, 0, 999999999)
-	between(&t.sec, 0, 59)
-	between(&t.min, 0, 59)
-	between(&t.hour, 0, 23)
+// Modifies the year, month and day if they were outside their usual ranges.
+func (t *Time) norm() {
+	norm_nanosecond(t)
+	norm_second(t)
+	norm_minute(t)
+	norm_hour(t)
+	norm_month(t)
+	norm_day(t)
+}
 
-	return t
+func norm_nanosecond(t *Time)  {
+	between(&t.nsec, 0, 999999999)
+}
+
+func norm_second(t *Time)  {
+	between(&t.sec, 0, 59)
+}
+
+func norm_minute(t *Time)  {
+	between(&t.min, 0, 59)
+}
+
+func norm_hour(t *Time)  {
+	between(&t.hour, 0, 23)
+}
+
+func norm_month(t *Time)  {
+	between(&t.month, 1, 12)
+}
+
+func norm_day(t *Time)  {
+	i := 0
+	if t.IsLeap() {
+		i = 1
+	}
+	between(&t.day, 1, p_month_count[t.month - 1][i])
 }
 
 func between(value *int, min, max int) {
@@ -341,4 +509,29 @@ func between(value *int, min, max int) {
 	} else if *value > max {
 		*value = max
 	}
+}
+
+func divider(num, den int) int {
+	if (num > 0) {
+		return num % den
+	}
+	return num - ((((num + 1) / den) - 1) * den)
+}
+
+func getJdn(year, month, day int) int {
+	base := year - 473
+	if year >= 0 {
+		base -= 1
+	}
+
+	epy := 474 + (base % 2820)
+
+	var md int
+	if month <= 7 {
+		md = (month - 1) * 31
+	} else {
+		md = (month - 1) * 30 + 6
+	}
+
+	return day + md + (epy * 682 - 110) / 2816 + (epy - 1) * 365 + base / 2820 * 1029983 + 1948320
 }
