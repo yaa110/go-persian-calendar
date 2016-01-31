@@ -141,4 +141,5 @@ pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یکشنبه 09:54:30
 - **IsLeap()** Returns true if the year of `ptime.Time` is a leap year.
 - **Zone()** Returns the zone name and its offset in seconds east of UTC of `ptime.Time`.
 
-**Note:** Use `go doc` for more methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `AM_PM`.
+## Documentation
+Use [online documentation in godoc.org](https://godoc.org/github.com/yaa110/go-persian-calendar/ptime) or `go doc` command for more information about methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `AM_PM`.
