@@ -10,8 +10,8 @@
 package ptime
 
 import (
-	"time"
 	"math"
+	"time"
 )
 
 // A Month specifies a month of the year in Persian calendar starting from 1.
@@ -22,15 +22,15 @@ type Weekday int
 
 // A PersianDate represents a day in Persian (Jalali) Calendar.
 type Time struct {
-	year int
+	year  int
 	month Month
-	day int
-	hour int
-	min int
-	sec int
-	nsec int
-	loc *time.Location
-	wday Weekday
+	day   int
+	hour  int
+	min   int
+	sec   int
+	nsec  int
+	loc   *time.Location
+	wday  Weekday
 }
 
 const (
@@ -75,7 +75,7 @@ const (
 
 // Locations based on Iran and Afghanistan time zones.
 var (
-	Iran, _ = time.LoadLocation("Asia/Tehran")
+	Iran, _        = time.LoadLocation("Asia/Tehran")
 	Afghanistan, _ = time.LoadLocation("Asia/Kabul")
 )
 
@@ -120,29 +120,29 @@ var days = [7]string{
 }
 
 //  {days, leap_days, days_before_start}
-var p_month_count = [12][3]int {
-	{  31,  31,   0 }, // Farvardin
-	{  31,  31,  31 }, // Ordibehesht
-	{  31,  31,  62 }, // Khordad
-	{  31,  31,  93 }, // Tir
-	{  31,  31, 124 }, // Mordad
-	{  31,  31, 155 }, // Shahrivar
-	{  30,  30, 186 }, // Mehr
-	{  30,  30, 216 }, // Aban
-	{  30,  30, 246 }, // Azar
-	{  30,  30, 276 }, // Dey
-	{  30,  30, 306 }, // Bahman
-	{  29,  30, 336 }, // Esfand
+var p_month_count = [12][3]int{
+	{31, 31, 0},   // Farvardin
+	{31, 31, 31},  // Ordibehesht
+	{31, 31, 62},  // Khordad
+	{31, 31, 93},  // Tir
+	{31, 31, 124}, // Mordad
+	{31, 31, 155}, // Shahrivar
+	{30, 30, 186}, // Mehr
+	{30, 30, 216}, // Aban
+	{30, 30, 246}, // Azar
+	{30, 30, 276}, // Dey
+	{30, 30, 306}, // Bahman
+	{29, 30, 336}, // Esfand
 }
 
 // Returns the Dari name of the month.
 func (m Month) Dari() string {
-	return dmonths[m - 1]
+	return dmonths[m-1]
 }
 
 // Returns the Persian name of the month.
 func (m Month) String() string {
-	return months[m - 1]
+	return months[m-1]
 }
 
 // Returns the Persian name of the day in week.
@@ -166,25 +166,25 @@ func (t Time) Time() time.Time {
 	if jdn > 2299160 {
 		l := jdn + 68569
 		n := 4 * l / 146097
-		l = l - (146097 * n + 3) / 4
+		l = l - (146097*n+3)/4
 		i := 4000 * (l + 1) / 1461001
-		l = l - 1461 * i / 4 + 31
+		l = l - 1461*i/4 + 31
 		j := 80 * l / 2447
-		day = l - 2447 * j / 80
+		day = l - 2447*j/80
 		l = j / 11
-		month = j + 2 - 12 * l
-		year = 100 * (n - 49) + i + l
+		month = j + 2 - 12*l
+		year = 100*(n-49) + i + l
 	} else {
 		j := jdn + 1402
 		k := (j - 1) / 1461
-		l := j - 1461 * k
-		n := (l - 1) / 365 - l / 1461
-		i := l - 365 * n + 30
+		l := j - 1461*k
+		n := (l-1)/365 - l/1461
+		i := l - 365*n + 30
 		j = 80 * i / 2447
-		day = i - 2447 * j / 80
+		day = i - 2447*j/80
 		i = j / 11
-		month = j + 2 - 12 * i
-		year = 4 * k + n + i - 4716
+		month = j + 2 - 12*i
+		year = 4*k + n + i - 4716
 	}
 
 	return time.Date(year, month, day, t.hour, t.min, t.sec, t.nsec, t.loc)
@@ -235,9 +235,9 @@ func (pt *Time) SetTime(t time.Time) {
 	gy, gm, gd := t.Date()
 
 	if gy > 1582 || (gy == 1582 && gm > 10) || (gy == 1582 && gm == 10 && gd > 14) {
-		jdn = ((1461 * (gy + 4800 + ((gm - 14) / 12))) / 4) + ((367 * (gm - 2 - 12 * (((gm - 14) / 12)))) / 12) - ((3 * (((gy + 4900 + ((gm - 14) / 12)) / 100))) / 4) + gd - 32075
+		jdn = ((1461 * (gy + 4800 + ((gm - 14) / 12))) / 4) + ((367 * (gm - 2 - 12*((gm-14)/12))) / 12) - ((3 * ((gy + 4900 + ((gm - 14) / 12)) / 100)) / 4) + gd - 32075
 	} else {
-		jdn = 367 * gy - ((7 * (gy + 5001 + ((gm - 9) / 7))) / 4) + ((275 * gm) / 9) + gd + 1729777
+		jdn = 367*gy - ((7 * (gy + 5001 + ((gm - 9) / 7))) / 4) + ((275 * gm) / 9) + gd + 1729777
 	}
 
 	dep := jdn - getJdn(475, 1, 1)
@@ -249,10 +249,10 @@ func (pt *Time) SetTime(t time.Time) {
 		ycyc = 2820
 	} else {
 		a := rem / 366
-		ycyc = (2134 * a + 2816 * (rem % 366) + 2815) / 1028522 + a + 1;
+		ycyc = (2134*a+2816*(rem%366)+2815)/1028522 + a + 1
 	}
 
-	year = ycyc + 2820 * cyc + 474
+	year = ycyc + 2820*cyc + 474
 	if year <= 0 {
 		year = year - 1
 	}
@@ -420,7 +420,7 @@ func (t Time) Location() *time.Location {
 
 // Returns the day in the year of t.
 func (t Time) YearDay() int {
-	return p_month_count[t.month - 1][2] + t.day
+	return p_month_count[t.month-1][2] + t.day
 }
 
 // Returns the weekday of t.
@@ -443,7 +443,7 @@ func (t Time) RMonthDay() int {
 	if t.IsLeap() {
 		i = 1
 	}
-	return p_month_count[t.month - 1][i] - t.day
+	return p_month_count[t.month-1][i] - t.day
 }
 
 func (t Time) FirstWeekDay() Time {
@@ -451,7 +451,7 @@ func (t Time) FirstWeekDay() Time {
 		return t
 	}
 
-	return t.AddDate(0, 0, Shanbe - t.wday)
+	return t.AddDate(0, 0, Shanbe-t.wday)
 }
 
 func (t Time) FirstMonthDay() Time {
@@ -473,7 +473,7 @@ func (t Time) LastWeekday() Time {
 	if t.wday == Jomeh {
 		return t
 	}
-	return t.AddDate(0, 0, Jomeh - t.wday)
+	return t.AddDate(0, 0, Jomeh-t.wday)
 }
 
 func (t Time) LastMonthDay() Time {
@@ -482,7 +482,7 @@ func (t Time) LastMonthDay() Time {
 		i = 1
 	}
 
-	ld := p_month_count[t.month - 1][i]
+	ld := p_month_count[t.month-1][i]
 
 	if ld == t.day {
 		return t
@@ -497,7 +497,7 @@ func (t Time) LastYearDay() Time {
 		i = 1
 	}
 
-	ld := p_month_count[Esfand - 1][i]
+	ld := p_month_count[Esfand-1][i]
 
 	if t.month == Esfand && t.day == ld {
 		return t
@@ -541,12 +541,12 @@ func (t Time) AddDate(years, months, days int) Time {
 
 // Returns the time.Duration between t and t2
 func (t Time) Since(t2 Time) time.Duration {
-	return math.Abs(t2.Unix() - t.Unix()) * time.Second
+	return math.Abs(t2.Unix()-t.Unix()) * time.Second
 }
 
 // Returns true if the year of t is a leap year.
 func (t Time) IsLeap() bool {
-	return divider(25 * t.year + 11, 33) < 8
+	return divider(25*t.year+11, 33) < 8
 }
 
 // Modifies the year, month and day if they were outside their usual ranges.
@@ -559,32 +559,32 @@ func (t *Time) norm() {
 	norm_day(t)
 }
 
-func norm_nanosecond(t *Time)  {
+func norm_nanosecond(t *Time) {
 	between(&t.nsec, 0, 999999999)
 }
 
-func norm_second(t *Time)  {
+func norm_second(t *Time) {
 	between(&t.sec, 0, 59)
 }
 
-func norm_minute(t *Time)  {
+func norm_minute(t *Time) {
 	between(&t.min, 0, 59)
 }
 
-func norm_hour(t *Time)  {
+func norm_hour(t *Time) {
 	between(&t.hour, 0, 23)
 }
 
-func norm_month(t *Time)  {
+func norm_month(t *Time) {
 	between(&t.month, 1, 12)
 }
 
-func norm_day(t *Time)  {
+func norm_day(t *Time) {
 	i := 0
 	if t.IsLeap() {
 		i = 1
 	}
-	between(&t.day, 1, p_month_count[t.month - 1][i])
+	between(&t.day, 1, p_month_count[t.month-1][i])
 }
 
 func between(value *int, min, max int) {
@@ -596,7 +596,7 @@ func between(value *int, min, max int) {
 }
 
 func divider(num, den int) int {
-	if (num > 0) {
+	if num > 0 {
 		return num % den
 	}
 	return num - ((((num + 1) / den) - 1) * den)
@@ -614,10 +614,10 @@ func getJdn(year, month, day int) int {
 	if month <= 7 {
 		md = (month - 1) * 31
 	} else {
-		md = (month - 1) * 30 + 6
+		md = (month-1)*30 + 6
 	}
 
-	return day + md + (epy * 682 - 110) / 2816 + (epy - 1) * 365 + base / 2820 * 1029983 + 1948320
+	return day + md + (epy*682-110)/2816 + (epy-1)*365 + base/2820*1029983 + 1948320
 }
 
 func getWeekday(wd time.Weekday) Weekday {
