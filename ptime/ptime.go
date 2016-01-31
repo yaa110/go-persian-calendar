@@ -677,41 +677,41 @@ func (t Time) ZoneOffset() string {
 }
 
 // Returns the formatted representation of t.
-// yyyy, yyy, y: year (e.g. 1394)
-// yy: 2-digits representation of year (e.g. 94)
-// MMM: the Persian name of month (e.g. فروردین)
-// MMI: the Dari name of month (e.g. حمل)
-// MM: 2-digits representation of month (e.g. 01)
-// M: month (e.g. 1)
-// rw: remaining weeks of year
-// w: week of year
-// RW: remaining weeks of month
-// W: week of month
-// RD: remaining days of year
-// D: day of year
-// rd: remaining days of month
-// dd: 2-digits representation of day (e.g. 01)
-// d: day (e.g. 1)
-// E: the Persian name of weekday (e.g. شنبه)
-// e: the Persian short name of weekday (e.g. ش)
-// A: the Persian name of 12-Hour marker (e.g. قبل از ظهر)
-// a: the Persian short name of 12-Hour marker (e.g. ق.ظ)
-// HH: 2-digits representation of hour [00-23]
-// H: hour [0-23]
-// kk: 2-digits representation of hour [01-24]
-// k: hour [1-24]
-// hh: 2-digits representation of hour [01-12]
-// h: hour [1-12]
-// KK: 2-digits representation of hour [00-11]
-// K: hour [0-11]
-// mm: 2-digits representation of minute [00-59]
-// m: minute [0-59]
-// ss: 2-digits representation of seconds [00-59]
-// s: seconds [0-59]
-// ns: nanoseconds
-// S: 3-digits representation of milliseconds (e.g. 001)
-// z: the name of location
-// Z: zone offset (e.g. +03:30)
+// yyyy, yyy, y     year (e.g. 1394)
+// yy               2-digits representation of year (e.g. 94)
+// MMM              the Persian name of month (e.g. فروردین)
+// MMI              the Dari name of month (e.g. حمل)
+// MM               2-digits representation of month (e.g. 01)
+// M                month (e.g. 1)
+// rw               remaining weeks of year
+// w                week of year
+// RW               remaining weeks of month
+// W                week of month
+// RD               remaining days of year
+// D                day of year
+// rd               remaining days of month
+// dd               2-digits representation of day (e.g. 01)
+// d                day (e.g. 1)
+// E                the Persian name of weekday (e.g. شنبه)
+// e                the Persian short name of weekday (e.g. ش)
+// A                the Persian name of 12-Hour marker (e.g. قبل از ظهر)
+// a                the Persian short name of 12-Hour marker (e.g. ق.ظ)
+// HH               2-digits representation of hour [00-23]
+// H                hour [0-23]
+// kk               2-digits representation of hour [01-24]
+// k                hour [1-24]
+// hh               2-digits representation of hour [01-12]
+// h                hour [1-12]
+// KK               2-digits representation of hour [00-11]
+// K                hour [0-11]
+// mm               2-digits representation of minute [00-59]
+// m                minute [0-59]
+// ss               2-digits representation of seconds [00-59]
+// s                seconds [0-59]
+// ns               nanoseconds
+// S                3-digits representation of milliseconds (e.g. 001)
+// z                the name of location
+// Z                zone offset (e.g. +03:30)
 func (t Time) Format(format string) string {
 	r := strings.NewReplacer(
 		"yyyy", strconv.Itoa(t.year),
