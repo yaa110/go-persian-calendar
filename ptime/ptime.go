@@ -372,6 +372,11 @@ func (t Time) Date() (int, Month, int) {
 	return t.year, t.month, t.day
 }
 
+// Returns the hour, minute, second offsets of t.
+func (t Time) Clock() (int, int, int) {
+	return t.hour, t.min, t.sec
+}
+
 // Returns the year of t.
 func (t Time) Year() int {
 	return t.year
@@ -442,53 +447,87 @@ func (t Time) RMonthDay() int {
 }
 
 func (t Time) FirstWeekDay() Time {
-	// TODO return the first day in the week
-	return nil
+	if t.wday == Shanbe {
+		return t
+	}
+
+	return t.AddDate(0, 0, Shanbe - t.wday)
 }
 
 func (t Time) FirstMonthDay() Time {
-	// TODO return the first day in the month
-	return nil
+	if t.day == 1 {
+		return t
+	}
+
+	return Date(t.year, t.month, 1, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
 func (t Time) FirstYearDay() Time {
-	// TODO return the first day in the year
-	return nil
+	if t.month == Farvardin && t.day == 1 {
+		return t
+	}
+	return Date(t.year, Farvardin, 1, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
 func (t Time) LastWeekday() Time {
-	// TODO return the last day in the week
-	return nil
+	if t.wday == Jomeh {
+		return t
+	}
+	return t.AddDate(0, 0, Jomeh - t.wday)
 }
 
 func (t Time) LastMonthDay() Time {
-	// TODO return the last day in the month
-	return nil
+	i := 0
+	if t.IsLeap() {
+		i = 1
+	}
+
+	ld := p_month_count[t.month - 1][i]
+
+	if ld == t.day {
+		return t
+	}
+
+	return Date(t.year, t.month, ld, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
 func (t Time) LastYearDay() Time {
-	// TODO return the last day in the year
-	return nil
+	i := 0
+	if t.IsLeap() {
+		i = 1
+	}
+
+	ld := p_month_count[Esfand - 1][i]
+
+	if t.month == Esfand && t.day == ld {
+		return t
+	}
+
+	return Date(t.year, Esfand, ld, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
 func (t Time) MonthWeek() int {
-	// TODO return the week number in the month
-	return 0
+	return t.day / 7
+}
+
+func (t Time) RMonthWeek() int {
+	return t.RMonthDay() / 7
 }
 
 func (t Time) YearWeek() int {
-	// TODO return the week number in the year
-	return 0
+	return t.YearDay() / 7
 }
 
-func (t Time) Yesterday() int {
-	// TODO return Yesterday
-	return 0
+func (t Time) RYearWeek() int {
+	return t.RYearDay() / 7
 }
 
-func (t Time) Tomorrow() int {
-	// TODO return Tomorrow
-	return 0
+func (t Time) Yesterday() Time {
+	return t.AddDate(0, 0, -1)
+}
+
+func (t Time) Tomorrow() Time {
+	return t.AddDate(0, 0, 1)
 }
 
 // Returns a new instance of Time for t+d.
