@@ -70,12 +70,12 @@ const (
 )
 
 const (
-	Shanbe Weekday = iota
-	Yekshanbe
-	Doshanbe
-	Seshanbe
-	Charshanbe
-	Panjshanbe
+	Shanbeh Weekday = iota
+	Yekshanbeh
+	Doshanbeh
+	Seshanbeh
+	Charshanbeh
+	Panjshanbeh
 	Jomeh
 )
 
@@ -534,11 +534,11 @@ func (t Time) RMonthDay() int {
 
 // Returns a new instance of Time representing the first day of the week of t.
 func (t Time) FirstWeekDay() Time {
-	if t.wday == Shanbe {
+	if t.wday == Shanbeh {
 		return t
 	}
 
-	return t.AddDate(0, 0, int(Shanbe-t.wday))
+	return t.AddDate(0, 0, int(Shanbeh -t.wday))
 }
 
 // Returns a new instance of Time representing the last day of the week of t.
@@ -844,17 +844,17 @@ func getJdn(year int, month int, day int) int {
 func getWeekday(wd time.Weekday) Weekday {
 	switch wd {
 	case time.Saturday:
-		return Shanbe
+		return Shanbeh
 	case time.Sunday:
-		return Yekshanbe
+		return Yekshanbeh
 	case time.Monday:
-		return Doshanbe
+		return Doshanbeh
 	case time.Tuesday:
-		return Seshanbe
+		return Seshanbeh
 	case time.Wednesday:
-		return Charshanbe
+		return Charshanbeh
 	case time.Thursday:
-		return Panjshanbe
+		return Panjshanbeh
 	case time.Friday:
 		return Jomeh
 	}
