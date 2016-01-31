@@ -1,3 +1,3 @@
 Persian Calendar
 ================
-The implementation of the Persian (Hijri-Shamshi, Jalali) Calendar in Go (golang)
+The implementation of the Persian (Solar Hijri) Calendar in Go (golang)

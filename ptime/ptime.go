@@ -30,21 +30,22 @@ type Time struct {
 	sec int
 	nsec int
 	loc *time.Location
+	wday Weekday
 }
 
 const (
-	Farvardin Month = 1 + iota
-	Ordibehesht
-	Khordad
-	Tir
-	Mordad
-	Shahrivar
-	Mehr
-	Aban
-	Azar
-	Dey
-	Bahman
-	Esfand
+	Farvardin, Hamal Month = 1 + iota
+	Ordibehesht, Sur
+	Khordad, Jauza
+	Tir, Saratan
+	Mordad, Asad
+	Shahrivar, Sonboleh
+	Mehr, Mizan
+	Aban, Aqrab
+	Azar, Qos
+	Dey, Jady
+	Bahman, Dolv
+	Esfand, Hut
 )
 
 const (
@@ -54,7 +55,12 @@ const (
 	Seshanbe
 	Charshanbe
 	Panjshanbe
-	Jome
+	Jomeh
+)
+
+var (
+	TEHRAN, _ = time.LoadLocation("Asia/Tehran")
+	KABUL, _ = time.LoadLocation("Asia/Kabul")
 )
 
 var months = [12]string{
@@ -72,6 +78,21 @@ var months = [12]string{
 	"اسفند",
 }
 
+var dmonths = [12]string{
+	"حمل",
+	"ثور",
+	"جوزا",
+	"سرطان",
+	"اسد",
+	"سنبله",
+	"میزان",
+	"عقرب",
+	"قوس",
+	"جدی",
+	"دلو",
+	"حوت",
+}
+
 var days = [7]string{
 	"شنبه",
 	"یک‌شنبه",
@@ -82,20 +103,25 @@ var days = [7]string{
 	"جمعه",
 }
 
-//  {days,   leap_days}
-var p_month_count = [12][2]int {
-	{31,     31},     // Farvardin
-	{31,     31},     // Ordibehesht
-	{31,     31},     // Khordad
-	{31,     31},     // Tir
-	{31,     31},     // Mordad
-	{31,     31},     // Shahrivar
-	{30,     30},     // Mehr
-	{30,     30},     // Aban
-	{30,     30},     // Azar
-	{30,     30},     // Dey
-	{30,     30},     // Bahman
-	{29,     30},     // Esfand
+//  {days, leap_days, days_before_start}
+var p_month_count = [12][3]int {
+	{  31,  31,   0 }, // Farvardin
+	{  31,  31,  31 }, // Ordibehesht
+	{  31,  31,  62 }, // Khordad
+	{  31,  31,  93 }, // Tir
+	{  31,  31, 124 }, // Mordad
+	{  31,  31, 155 }, // Shahrivar
+	{  30,  30, 186 }, // Mehr
+	{  30,  30, 216 }, // Aban
+	{  30,  30, 246 }, // Azar
+	{  30,  30, 276 }, // Dey
+	{  30,  30, 306 }, // Bahman
+	{  29,  30, 336 }, // Esfand
+}
+
+// Returns the Dari name of the month.
+func (m Month) Dari() string {
+	return dmonths[m - 1]
 }
 
 // Returns the Persian name of the month.
@@ -154,8 +180,8 @@ func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Locati
 		panic("ptime: the Location must not be nil in call to Date")
 	}
 
-	t := Time{year, month, day, hour, min, sec, nsec, loc}
-	&t.norm()
+	t := Time{}
+	&t.Set(year, month, day, hour, min, sec, nsec, loc)
 
 	return t
 }
@@ -179,7 +205,6 @@ func Now(loc *time.Location) Time {
 }
 
 // Converts Gregorian date to Persian date.
-// TODO has bug
 func (pt *Time) SetTime(t time.Time) {
 	var year, month, day int
 
@@ -188,6 +213,7 @@ func (pt *Time) SetTime(t time.Time) {
 	pt.min = t.Minute()
 	pt.hour = t.Hour()
 	pt.loc = t.Location()
+	pt.resetWeekday()
 
 	var jdn int
 	gy, gm, gd := t.Date()
@@ -251,6 +277,7 @@ func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *ti
 	t.sec = sec
 	t.nsec = nsec
 	t.loc = loc
+	t.resetWeekday()
 
 	t.norm()
 }
@@ -258,17 +285,20 @@ func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *ti
 func (t *Time) SetYear(year int) {
 	t.year = year
 	norm_day(t)
+	t.resetWeekday()
 }
 
 func (t *Time) SetMonth(month Month) {
 	t.month = month
 	norm_month(t)
 	norm_day(t)
+	t.resetWeekday()
 }
 
 func (t *Time) SetDay(day int) {
 	t.day = day
 	norm_day(t)
+	t.resetWeekday()
 }
 
 func (t *Time) SetHour(hour int) {
@@ -297,6 +327,7 @@ func (t *Time) In(loc *time.Location) {
 	}
 
 	t.loc = loc
+	t.resetWeekday()
 }
 
 func (t *Time) At(hour, min, sec, nsec int) {
@@ -368,14 +399,12 @@ func (t Time) Location() *time.Location {
 
 // Returns the day in the year of t.
 func (t Time) YearDay() int {
-	// TODO YearDay of PersianDate
-	return 0
+	return p_month_count[t.month][2] + t.day
 }
 
 // Returns the weekday of t.
 func (t Time) Weekday() Weekday {
-	// TODO Weekday of PersianDate
-	return 0
+	return t.wday
 }
 
 // Returns the number of remaining days in the year of t.
@@ -396,32 +425,32 @@ func (t Time) RWeekday() int {
 	return 0
 }
 
-func (t Time) FirstDayInWeek() Time {
+func (t Time) FirstWeekDay() Time {
 	// TODO return the first day in the week
 	return nil
 }
 
-func (t Time) FirstDayInMonth() Time {
+func (t Time) FirstMonthDay() Time {
 	// TODO return the first day in the month
 	return nil
 }
 
-func (t Time) FirstDayInYear() Time {
+func (t Time) FirstYearDay() Time {
 	// TODO return the first day in the year
 	return nil
 }
 
-func (t Time) LastDayInWeek() Time {
+func (t Time) LastWeekday() Time {
 	// TODO return the last day in the week
 	return nil
 }
 
-func (t Time) LastDayInMonth() Time {
+func (t Time) LastMonthDay() Time {
 	// TODO return the last day in the month
 	return nil
 }
 
-func (t Time) LastDayInYear() Time {
+func (t Time) LastYearDay() Time {
 	// TODO return the last day in the year
 	return nil
 }
@@ -534,4 +563,28 @@ func getJdn(year, month, day int) int {
 	}
 
 	return day + md + (epy * 682 - 110) / 2816 + (epy - 1) * 365 + base / 2820 * 1029983 + 1948320
+}
+
+func getWeekday(wd time.Weekday) Weekday {
+	switch wd {
+	case time.Saturday:
+		return Shanbe
+	case time.Sunday:
+		return Yekshanbe
+	case time.Monday:
+		return Doshanbe
+	case time.Tuesday:
+		return Seshanbe
+	case time.Wednesday:
+		return Charshanbe
+	case time.Thursday:
+		return Panjshanbe
+	case time.Friday:
+		return Jomeh
+	}
+	return 0
+}
+
+func (t *Time) resetWeekday() {
+	t.wday = getWeekday(t.Time().Weekday())
 }
