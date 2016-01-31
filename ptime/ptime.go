@@ -80,7 +80,7 @@ const (
 )
 
 const (
-	AM int = 0 + iota
+	AM AM_PM = 0 + iota
 	PM
 )
 
@@ -204,18 +204,18 @@ func (a AM_PM) Short() string {
 // Converts Gregorian calendar to Persian calendar and
 // returns a new instance of Time corresponding to the time of t.
 // t is an instance of time.Time in Gregorian calendar.
-func Time(t time.Time) Time {
-	pt := Time{}
-	&pt.SetTime(t)
+func New(t time.Time) Time {
+	pt := new(Time)
+	pt.SetTime(t)
 
-	return pt
+	return *pt
 }
 
 // Converts Persian date to Gregorian date and returns a new instance of time.Time
 func (t Time) Time() time.Time {
 	var year, month, day int
 
-	jdn := getJdn(t.year, t.month, t.day)
+	jdn := getJdn(t.year, int(t.month), t.day)
 
 	if jdn > 2299160 {
 		l := jdn + 68569
@@ -241,7 +241,7 @@ func (t Time) Time() time.Time {
 		year = 4*k + n + i - 4716
 	}
 
-	return time.Date(year, month, day, t.hour, t.min, t.sec, t.nsec, t.loc)
+	return time.Date(year, time.Month(month), day, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
 // Returns a new instance of Time.
@@ -253,10 +253,10 @@ func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Locati
 		panic("ptime: the Location must not be nil in call to Date")
 	}
 
-	t := Time{}
-	&t.Set(year, month, day, hour, min, sec, nsec, loc)
+	t := new(Time)
+	t.Set(year, month, day, hour, min, sec, nsec, loc)
 
-	return t
+	return *t
 }
 
 // Returns a new instance of PersianDate from unix timestamp.
@@ -267,7 +267,7 @@ func Unix(sec, nsec int64, loc *time.Location) Time {
 		panic("ptime: the Location must not be nil in call to Unix")
 	}
 
-	return Time(time.Unix(sec, nsec).In(loc))
+	return New(time.Unix(sec, nsec).In(loc))
 }
 
 // Returns a new instance of Time corresponding to the current time.
@@ -277,7 +277,7 @@ func Now(loc *time.Location) Time {
 		panic("ptime: the Location must not be nil in call to Now")
 	}
 
-	return Time(time.Now().In(loc))
+	return New(time.Now().In(loc))
 }
 
 // Sets pt to the time of t.
@@ -292,7 +292,8 @@ func (pt *Time) SetTime(t time.Time) {
 	pt.wday = getWeekday(t.Weekday())
 
 	var jdn int
-	gy, gm, gd := t.Date()
+	gy, gmm, gd := t.Date()
+	gm := int(gmm)
 
 	if gy > 1582 || (gy == 1582 && gm > 10) || (gy == 1582 && gm == 10 && gd > 14) {
 		jdn = ((1461 * (gy + 4800 + ((gm - 14) / 12))) / 4) + ((367 * (gm - 2 - 12*((gm-14)/12))) / 12) - ((3 * ((gy + 4900 + ((gm - 14) / 12)) / 100)) / 4) + gd - 32075
@@ -327,7 +328,7 @@ func (pt *Time) SetTime(t time.Time) {
 	day = jdn - getJdn(year, month, 1) + 1
 
 	pt.year = year
-	pt.month = month
+	pt.month = Month(month)
 	pt.day = day
 }
 
@@ -537,7 +538,7 @@ func (t Time) FirstWeekDay() Time {
 		return t
 	}
 
-	return t.AddDate(0, 0, Shanbe-t.wday)
+	return t.AddDate(0, 0, int(Shanbe-t.wday))
 }
 
 // Returns a new instance of Time representing the last day of the week of t.
@@ -545,7 +546,7 @@ func (t Time) LastWeekday() Time {
 	if t.wday == Jomeh {
 		return t
 	}
-	return t.AddDate(0, 0, Jomeh-t.wday)
+	return t.AddDate(0, 0, int(Jomeh-t.wday))
 }
 
 // Returns a new instance of Time representing the first day of the month of t.
@@ -629,17 +630,17 @@ func (t Time) Tomorrow() Time {
 
 // Returns a new instance of Time for t+d.
 func (t Time) Add(d time.Duration) Time {
-	return Time(t.Time().Add(d))
+	return New(t.Time().Add(d))
 }
 
 // Returns a new instance of Time for t.year+years, t.month+months and t.day+days.
 func (t Time) AddDate(years, months, days int) Time {
-	return Time(t.Time().AddDate(years, months, days))
+	return New(t.Time().AddDate(years, months, days))
 }
 
 // Returns the number of seconds between t and t2.
-func (t Time) Since(t2 Time) int {
-	return math.Abs(t2.Unix() - t.Unix())
+func (t Time) Since(t2 Time) int64 {
+	return int64(math.Abs(float64(t2.Unix() - t.Unix())))
 }
 
 // Returns true if the year of t is a leap year.
@@ -721,7 +722,7 @@ func (t Time) Format(format string) string {
 		"MMM", t.month.String(),
 		"MMI", t.month.Dari(),
 		"MM", fmt.Sprintf("%02d", t.month),
-		"M", strconv.Itoa(t.month),
+		"M", strconv.Itoa(int(t.month)),
 		"rw", strconv.Itoa(t.RYearWeek()),
 		"w", strconv.Itoa(t.YearWeek()),
 		"RW", strconv.Itoa(t.RMonthWeek()),
@@ -788,7 +789,7 @@ func norm_hour(t *Time) {
 }
 
 func norm_month(t *Time) {
-	between(&t.month, 1, 12)
+	betweenMonth(&t.month, Farvardin, Esfand)
 }
 
 func norm_day(t *Time) {
@@ -797,6 +798,14 @@ func norm_day(t *Time) {
 		i = 1
 	}
 	between(&t.day, 1, p_month_count[t.month-1][i])
+}
+
+func betweenMonth(value *Month, min, max Month) {
+	if *value < min {
+		*value = min
+	} else if *value > max {
+		*value = max
+	}
 }
 
 func between(value *int, min, max int) {
@@ -814,7 +823,7 @@ func divider(num, den int) int {
 	return num - ((((num + 1) / den) - 1) * den)
 }
 
-func getJdn(year, month, day int) int {
+func getJdn(year int, month int, day int) int {
 	base := year - 473
 	if year >= 0 {
 		base -= 1
