@@ -6,7 +6,7 @@
 // Copyright (c) 2016 Navid Fathollahzade
 // This source code is licensed under MIT license that can be found in the LICENSE file.
 
-// Package ptime provides functionality for implementation of Persian (Jalali) Calendar.
+// Package ptime provides functionality for implementation of Persian (Solar Hijri) Calendar.
 package ptime
 
 import (
@@ -163,6 +163,11 @@ var p_month_count = [12][3]int{
 	{30, 30, 276}, // Dey
 	{30, 30, 306}, // Bahman
 	{29, 30, 336}, // Esfand
+}
+
+// Returns t in RFC3339Nano.
+func (t Time) String() string {
+	return t.Format("yyyy-MM-ddTHH:mm:ss.nsZ")
 }
 
 // Returns the Dari name of the month.
@@ -612,6 +617,24 @@ func (t Time) AmPm() AM_PM {
 	return m
 }
 
+func (t Time) Zone() (string, int) {
+	return t.Time().Zone()
+}
+
+func (t Time) ZoneOffset() string {
+	_, offset := t.Zone()
+
+	sign := "+"
+	if offset < 0 {
+		sign = "-"
+	}
+
+	h := offset / 3600
+	m := (offset - h*3600) / 60
+
+	return fmt.Sprintf("%s%02d:%02d", sign, h, m)
+}
+
 func (t Time) Format(format string) string {
 	r := strings.NewReplacer(
 		"yyyy", strconv.Itoa(t.year),
@@ -619,7 +642,7 @@ func (t Time) Format(format string) string {
 		"yy", strconv.Itoa(t.year)[2:],
 		"y", strconv.Itoa(t.year),
 		"MMM", t.month.String(),
-		"MMD", t.month.Dari(),
+		"MMI", t.month.Dari(),
 		"MM", fmt.Sprintf("%02d", t.month),
 		"M", strconv.Itoa(t.month),
 		"rw", strconv.Itoa(t.RYearWeek()),
@@ -629,6 +652,7 @@ func (t Time) Format(format string) string {
 		"RD", strconv.Itoa(t.RYearDay()),
 		"D", strconv.Itoa(t.YearDay()),
 		"rd", strconv.Itoa(t.RMonthDay()),
+		"dd", fmt.Sprintf("%02d", t.day),
 		"d", strconv.Itoa(t.day),
 		"E", t.wday.String(),
 		"e", t.wday.Short(),
@@ -647,9 +671,9 @@ func (t Time) Format(format string) string {
 		"ns", strconv.Itoa(t.nsec),
 		"ss", fmt.Sprintf("%02d", t.sec),
 		"s", strconv.Itoa(t.sec),
-		"S", strconv.Itoa(t.nsec/1e6),
+		"S", fmt.Sprintf("%03d", t.nsec/1e6),
 		"z", t.loc.String(),
-		"Z", t.loc.String(),
+		"Z", t.ZoneOffset(),
 	)
 	return r.Replace(format)
 }
