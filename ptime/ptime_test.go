@@ -120,6 +120,24 @@ func TestDariMonthName(t *testing.T)  {
 	}
 }
 
+func TestLocations(t *testing.T) {
+	if (Iran.String() != "Asia/Tehran") {
+		t.Error(
+			"For", "Iran",
+			"expected", "Asia/Tehran",
+			"got", Iran.String(),
+		)
+	}
+
+	if (Afghanistan.String() != "Asia/Kabul") {
+		t.Error(
+			"For", "Afghanistan",
+			"expected", "Asia/Kabul",
+			"got", Iran.String(),
+		)
+	}
+}
+
 func TestPersianToGregorian(t *testing.T) {
 	for _, p := range date_conversions {
 		gt := Date(p.persian.year, p.persian.month, p.persian.day, 11, 59, 59, 0, Iran).Time()
