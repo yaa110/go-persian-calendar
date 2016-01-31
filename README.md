@@ -117,29 +117,5 @@ pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یکشنبه 09:54:30
 // Z                zone offset (e.g. +03:30)
 ```
 
-## Methods of `ptime.Time`
-- **String()** RFC3339Nano format of `ptime.Time`.
-- **Time()** Converts Persian date to Gregorian date and returns a new instance of `time.Time`
-- **Unix()** Returns the number of seconds since January 1, 1970 UTC.
-- **Date()** Returns the year, month, day of `ptime.Time`.
-- **Clock()** Returns the hour, minute, seconds offsets of `ptime.Time`.
-- **YearDay()** Returns the day of year of `ptime.Time`.
-- **RYearDay()** Returns the number of remaining days of the year of `ptime.Time`.
-- **RMonthDay()** Returns the number of remaining days of the month of `ptime.Time`.
-- **FirstWeekDay()** Returns a new instance of Time representing the first day of the week of `ptime.Time`.
-- **LastWeekday()** Returns a new instance of Time representing the last day of the week of `ptime.Time`.
-- **FirstMonthDay()** Returns a new instance of Time representing the first day of the month of `ptime.Time`.
-- **LastMonthDay()** Returns a new instance of Time representing the last day of the month of `ptime.Time`.
-- **FirstYearDay()** Returns a new instance of Time representing the first day of the year of `ptime.Time`.
-- **LastYearDay()** Returns a new instance of Time representing the last day of the year of `ptime.Time`.
-- **MonthWeek()** Returns the week of month of `ptime.Time`.
-- **RMonthWeek()** Returns the number of remaining weeks of the month of `ptime.Time`.
-- **YearWeek()** Returns the week of year of `ptime.Time`.
-- **RYearWeek()** Returns the number of remaining weeks of the year of `ptime.Time`.
-- **Yesterday()** Returns a new instance of `ptime.Time` representing a day before the day of another `ptime.Time`.
-- **Tomorrow()** Returns a new instance of `ptime.Time` representing a day after the day of another `ptime.Time`.
-- **IsLeap()** Returns true if the year of `ptime.Time` is a leap year.
-- **Zone()** Returns the zone name and its offset in seconds east of UTC of `ptime.Time`.
-
 ## Documentation
 Use [online documentation in godoc.org](https://godoc.org/github.com/yaa110/go-persian-calendar/ptime) or `go doc` command for more information about methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `AM_PM`.
