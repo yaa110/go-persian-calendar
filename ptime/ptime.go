@@ -17,15 +17,16 @@ import (
 	"time"
 )
 
-// A Month specifies a month of the year in Persian calendar starting from 1.
+// A Month specifies a month of the year starting from Farvardin = 1.
 type Month int
 
-// A Weekday specifies a day of the week in Persian starting from 0.
+// A Weekday specifies a day of the week starting from Shanbe = 0.
 type Weekday int
 
+// A AM_PM specifies the 12-Hour marker.
 type AM_PM int
 
-// A PersianDate represents a day in Persian (Jalali) Calendar.
+// A Time represents a moment in time in Persian (Jalali) Calendar.
 type Time struct {
 	year  int
 	month Month
@@ -83,7 +84,7 @@ const (
 	PM
 )
 
-// Locations based on Iran and Afghanistan time zones.
+// Pointers to time.Location for Iran and Afghanistan time zones.
 var (
 	Iran        = time.FixedZone("Asia/Tehran", 12600) // UTC + 03:30
 	Afghanistan = time.FixedZone("Asia/Kabul", 16200)  // UTC + 04:30
@@ -165,7 +166,7 @@ var p_month_count = [12][3]int{
 	{29, 30, 336}, // Esfand
 }
 
-// Returns t in RFC3339Nano.
+// Returns t in RFC3339Nano format.
 func (t Time) String() string {
 	return t.Format("yyyy-MM-ddTHH:mm:ss.nsZ")
 }
@@ -190,16 +191,19 @@ func (d Weekday) Short() string {
 	return sdays[d]
 }
 
-// Returns the Persian name of the AM_PM.
+// Returns the Persian name of 12-Hour marker.
 func (a AM_PM) String() string {
 	return am_pm[a]
 }
 
-// Returns the Persian short name of the AM_PM.
+// Returns the Persian short name of 12-Hour marker.
 func (a AM_PM) Short() string {
 	return s_am_pm[a]
 }
 
+// Converts Gregorian calendar to Persian calendar and
+// returns a new instance of Time corresponding to the time of t.
+// t is an instance of time.Time in Gregorian calendar.
 func Time(t time.Time) Time {
 	pt := Time{}
 	&pt.SetTime(t)
@@ -207,7 +211,7 @@ func Time(t time.Time) Time {
 	return pt
 }
 
-// Converts Persian date to Gregorian date and returns an instance of time.Time
+// Converts Persian date to Gregorian date and returns a new instance of time.Time
 func (t Time) Time() time.Time {
 	var year, month, day int
 
@@ -240,7 +244,10 @@ func (t Time) Time() time.Time {
 	return time.Date(year, month, day, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
-// Returns a new instance of PersianDate.
+// Returns a new instance of Time.
+// year, month and day represent a day in Persian calendar.
+// hour, min minute, sec seconds, nsec nanoseconds offsets represent a moment in time.
+// loc is a pointer to time.Location and must not be nil.
 func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Location) Time {
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to Date")
@@ -254,6 +261,7 @@ func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Locati
 
 // Returns a new instance of PersianDate from unix timestamp.
 // sec seconds and nsec nanoseconds since January 1, 1970 UTC.
+// loc is a pointer to time.Location and must not be nil.
 func Unix(sec, nsec int64, loc *time.Location) Time {
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to Unix")
@@ -262,6 +270,8 @@ func Unix(sec, nsec int64, loc *time.Location) Time {
 	return Time(time.Unix(sec, nsec).In(loc))
 }
 
+// Returns a new instance of Time corresponding to the current time.
+// loc is a pointer to time.Location and must not be nil.
 func Now(loc *time.Location) Time {
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to Now")
@@ -270,7 +280,7 @@ func Now(loc *time.Location) Time {
 	return Time(time.Now().In(loc))
 }
 
-// Converts Gregorian date to Persian date.
+// Sets pt to the time of t.
 func (pt *Time) SetTime(t time.Time) {
 	var year, month, day int
 
@@ -279,7 +289,7 @@ func (pt *Time) SetTime(t time.Time) {
 	pt.min = t.Minute()
 	pt.hour = t.Hour()
 	pt.loc = t.Location()
-	pt.resetWeekday()
+	pt.wday = getWeekday(t.Weekday())
 
 	var jdn int
 	gy, gm, gd := t.Date()
@@ -321,7 +331,9 @@ func (pt *Time) SetTime(t time.Time) {
 	pt.day = day
 }
 
-// Changes t using unix timestamp
+// Sets t to represent the corresponding unix timestamp of
+// sec seconds and nsec nanoseconds since January 1, 1970 UTC.
+// loc is a pointer to time.Location and must not be nil.
 func (t *Time) SetUnix(sec, nsec int64, loc *time.Location) {
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to SetUnix")
@@ -330,6 +342,10 @@ func (t *Time) SetUnix(sec, nsec int64, loc *time.Location) {
 	t.SetTime(time.Unix(sec, nsec).In(loc))
 }
 
+// Sets t.
+// year, month and day represent a day in Persian calendar.
+// hour, min minute, sec seconds, nsec nanoseconds offsets represent a moment in time.
+// loc is a pointer to time.Location and must not be nil.
 func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *time.Location) {
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to Change")
@@ -348,12 +364,14 @@ func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *ti
 	t.norm()
 }
 
+// Sets the year of t.
 func (t *Time) SetYear(year int) {
 	t.year = year
 	norm_day(t)
 	t.resetWeekday()
 }
 
+// Sets the month of t.
 func (t *Time) SetMonth(month Month) {
 	t.month = month
 	norm_month(t)
@@ -361,32 +379,39 @@ func (t *Time) SetMonth(month Month) {
 	t.resetWeekday()
 }
 
+// Sets the day of t.
 func (t *Time) SetDay(day int) {
 	t.day = day
 	norm_day(t)
 	t.resetWeekday()
 }
 
+// Sets the hour of t.
 func (t *Time) SetHour(hour int) {
 	t.hour = hour
 	norm_hour(t)
 }
 
+// Sets the minute offset of t.
 func (t *Time) SetMinute(min int) {
 	t.min = min
 	norm_minute(t)
 }
 
+// Sets the second offset of t.
 func (t *Time) SetSecond(sec int) {
 	t.sec = sec
 	norm_second(t)
 }
 
+// Sets the nanosecond offset of t.
 func (t *Time) SetNanosecond(nsec int) {
 	t.nsec = nsec
 	norm_nanosecond(t)
 }
 
+// Sets the location of t.
+// loc is a pointer to time.Location and must not be nil.
 func (t *Time) In(loc *time.Location) {
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to In")
@@ -396,6 +421,7 @@ func (t *Time) In(loc *time.Location) {
 	t.resetWeekday()
 }
 
+// Sets the hour, min minute, sec second and nsec nanoseconds offsets of t.
 func (t *Time) At(hour, min, sec, nsec int) {
 	t.hour = hour
 	t.min = min
@@ -407,12 +433,12 @@ func (t *Time) At(hour, min, sec, nsec int) {
 	norm_nanosecond(t)
 }
 
-// Returns unix timestamp (the number of seconds) of t.
+// Returns the number of seconds since January 1, 1970 UTC.
 func (t Time) Unix() int64 {
 	return t.Time().Unix()
 }
 
-// Returns unix timestamp (the number of nanoseconds) of t.
+// Returns the number of nanoseconds since January 1, 1970 UTC.
 func (t Time) UnixNano() int64 {
 	return t.Time().UnixNano()
 }
@@ -422,7 +448,7 @@ func (t Time) Date() (int, Month, int) {
 	return t.year, t.month, t.day
 }
 
-// Returns the hour, minute, second offsets of t.
+// Returns the hour, minute, seconds offsets of t.
 func (t Time) Clock() (int, int, int) {
 	return t.hour, t.min, t.sec
 }
@@ -432,12 +458,12 @@ func (t Time) Year() int {
 	return t.year
 }
 
-// Returns the month of t.
+// Returns the month of t in the range [1, 12].
 func (t Time) Month() Month {
 	return t.month
 }
 
-// Returns the day in month of t.
+// Returns the day of month of t.
 func (t Time) Day() int {
 	return t.day
 }
@@ -462,28 +488,27 @@ func (t Time) Minute() int {
 	return t.min
 }
 
-// Returns the second offset of t in the range [0, 59].
+// Returns the seconds offset of t in the range [0, 59].
 func (t Time) Second() int {
 	return t.sec
 }
 
-// Returns the nanosecond offset of t in the range [0, 999999999].
+// Returns the nanoseconds offset of t in the range [0, 999999999].
 func (t Time) Nanosecond() int {
 	return t.nsec
 }
 
-// Returns the time zone information of t.
-// For more information check the documentation of time.Location
+// Returns a pointer to time.Location of t.
 func (t Time) Location() *time.Location {
 	return t.loc
 }
 
-// Returns the day in the year of t.
+// Returns the day of year of t.
 func (t Time) YearDay() int {
 	return p_month_count[t.month-1][2] + t.day
 }
 
-// Returns the number of remaining days in the year of t.
+// Returns the number of remaining days of the year of t.
 func (t Time) RYearDay() int {
 	y := 365
 	if t.IsLeap() {
@@ -497,7 +522,7 @@ func (t Time) Weekday() Weekday {
 	return t.wday
 }
 
-// Returns the number of remaining days in the month of t.
+// Returns the number of remaining days of the month of t.
 func (t Time) RMonthDay() int {
 	i := 0
 	if t.IsLeap() {
@@ -506,6 +531,7 @@ func (t Time) RMonthDay() int {
 	return p_month_count[t.month-1][i] - t.day
 }
 
+// Returns a new instance of Time representing the first day of the week of t.
 func (t Time) FirstWeekDay() Time {
 	if t.wday == Shanbe {
 		return t
@@ -514,6 +540,7 @@ func (t Time) FirstWeekDay() Time {
 	return t.AddDate(0, 0, Shanbe-t.wday)
 }
 
+// Returns a new instance of Time representing the last day of the week of t.
 func (t Time) LastWeekday() Time {
 	if t.wday == Jomeh {
 		return t
@@ -521,6 +548,7 @@ func (t Time) LastWeekday() Time {
 	return t.AddDate(0, 0, Jomeh-t.wday)
 }
 
+// Returns a new instance of Time representing the first day of the month of t.
 func (t Time) FirstMonthDay() Time {
 	if t.day == 1 {
 		return t
@@ -529,13 +557,7 @@ func (t Time) FirstMonthDay() Time {
 	return Date(t.year, t.month, 1, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
-func (t Time) FirstYearDay() Time {
-	if t.month == Farvardin && t.day == 1 {
-		return t
-	}
-	return Date(t.year, Farvardin, 1, t.hour, t.min, t.sec, t.nsec, t.loc)
-}
-
+// Returns a new instance of Time representing the last day of the month of t.
 func (t Time) LastMonthDay() Time {
 	i := 0
 	if t.IsLeap() {
@@ -551,6 +573,15 @@ func (t Time) LastMonthDay() Time {
 	return Date(t.year, t.month, ld, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
+// Returns a new instance of Time representing the first day of the year of t.
+func (t Time) FirstYearDay() Time {
+	if t.month == Farvardin && t.day == 1 {
+		return t
+	}
+	return Date(t.year, Farvardin, 1, t.hour, t.min, t.sec, t.nsec, t.loc)
+}
+
+// Returns a new instance of Time representing the last day of the year of t.
 func (t Time) LastYearDay() Time {
 	i := 0
 	if t.IsLeap() {
@@ -566,26 +597,32 @@ func (t Time) LastYearDay() Time {
 	return Date(t.year, Esfand, ld, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
+// Returns the week of month of t.
 func (t Time) MonthWeek() int {
 	return t.day / 7
 }
 
+// Returns the number of remaining weeks of the month of t.
 func (t Time) RMonthWeek() int {
 	return t.RMonthDay() / 7
 }
 
+// Returns the week of year of t.
 func (t Time) YearWeek() int {
 	return t.YearDay() / 7
 }
 
+// Returns the number of remaining weeks of the year of t.
 func (t Time) RYearWeek() int {
 	return t.RYearDay() / 7
 }
 
+// Returns a new instance of Time representing a day before the day of t.
 func (t Time) Yesterday() Time {
 	return t.AddDate(0, 0, -1)
 }
 
+// Returns a new instance of Time representing a day after the day of t.
 func (t Time) Tomorrow() Time {
 	return t.AddDate(0, 0, 1)
 }
@@ -595,13 +632,14 @@ func (t Time) Add(d time.Duration) Time {
 	return Time(t.Time().Add(d))
 }
 
+// Returns a new instance of Time for t.year+years, t.month+months and t.day+days.
 func (t Time) AddDate(years, months, days int) Time {
 	return Time(t.Time().AddDate(years, months, days))
 }
 
-// Returns the time.Duration between t and t2
-func (t Time) Since(t2 Time) time.Duration {
-	return math.Abs(t2.Unix()-t.Unix()) * time.Second
+// Returns the number of seconds between t and t2.
+func (t Time) Since(t2 Time) int {
+	return math.Abs(t2.Unix() - t.Unix())
 }
 
 // Returns true if the year of t is a leap year.
@@ -609,6 +647,7 @@ func (t Time) IsLeap() bool {
 	return divider(25*t.year+11, 33) < 8
 }
 
+// Returns the 12-Hour marker of t.
 func (t Time) AmPm() AM_PM {
 	m := AM
 	if t.hour > 12 || (t.hour == 12 && (t.min > 0 || t.sec > 0)) {
@@ -617,10 +656,12 @@ func (t Time) AmPm() AM_PM {
 	return m
 }
 
+// Returns the zone name and its offset in seconds east of UTC of t.
 func (t Time) Zone() (string, int) {
 	return t.Time().Zone()
 }
 
+// Returns the zone offset of t in the format of [+|-]HH:mm.
 func (t Time) ZoneOffset() string {
 	_, offset := t.Zone()
 
@@ -635,6 +676,42 @@ func (t Time) ZoneOffset() string {
 	return fmt.Sprintf("%s%02d:%02d", sign, h, m)
 }
 
+// Returns the formatted representation of t.
+// yyyy, yyy, y: year (e.g. 1394)
+// yy: 2-digits representation of year (e.g. 94)
+// MMM: the Persian name of month (e.g. فروردین)
+// MMI: the Dari name of month (e.g. حمل)
+// MM: 2-digits representation of month (e.g. 01)
+// M: month (e.g. 1)
+// rw: remaining weeks of year
+// w: week of year
+// RW: remaining weeks of month
+// W: week of month
+// RD: remaining days of year
+// D: day of year
+// rd: remaining days of month
+// dd: 2-digits representation of day (e.g. 01)
+// d: day (e.g. 1)
+// E: the Persian name of weekday (e.g. شنبه)
+// e: the Persian short name of weekday (e.g. ش)
+// A: the Persian name of 12-Hour marker (e.g. قبل از ظهر)
+// a: the Persian short name of 12-Hour marker (e.g. ق.ظ)
+// HH: 2-digits representation of hour [00-23]
+// H: hour [0-23]
+// kk: 2-digits representation of hour [01-24]
+// k: hour [1-24]
+// hh: 2-digits representation of hour [01-12]
+// h: hour [1-12]
+// KK: 2-digits representation of hour [00-11]
+// K: hour [0-11]
+// mm: 2-digits representation of minute [00-59]
+// m: minute [0-59]
+// ss: 2-digits representation of seconds [00-59]
+// s: seconds [0-59]
+// ns: nanoseconds
+// S: 3-digits representation of milliseconds (e.g. 001)
+// z: the name of location
+// Z: zone offset (e.g. +03:30)
 func (t Time) Format(format string) string {
 	r := strings.NewReplacer(
 		"yyyy", strconv.Itoa(t.year),
