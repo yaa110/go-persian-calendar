@@ -10,7 +10,10 @@
 package ptime
 
 import (
+	"fmt"
 	"math"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -19,6 +22,8 @@ type Month int
 
 // A Weekday specifies a day of the week in Persian starting from 0.
 type Weekday int
+
+type AM_PM int
 
 // A PersianDate represents a day in Persian (Jalali) Calendar.
 type Time struct {
@@ -73,11 +78,26 @@ const (
 	Jomeh
 )
 
+const (
+	AM int = 0 + iota
+	PM
+)
+
 // Locations based on Iran and Afghanistan time zones.
 var (
-	Iran, _        = time.LoadLocation("Asia/Tehran")
-	Afghanistan, _ = time.LoadLocation("Asia/Kabul")
+	Iran        = time.FixedZone("Asia/Tehran", 12600) // UTC + 03:30
+	Afghanistan = time.FixedZone("Asia/Kabul", 16200)  // UTC + 04:30
 )
+
+var am_pm = [2]string{
+	"قبل از ظهر",
+	"بعد از ظهر",
+}
+
+var s_am_pm = [2]string{
+	"ق.ظ",
+	"ب.ظ",
+}
 
 var months = [12]string{
 	"فروردین",
@@ -119,6 +139,16 @@ var days = [7]string{
 	"جمعه",
 }
 
+var sdays = [7]string{
+	"ش",
+	"ی",
+	"د",
+	"س",
+	"چ",
+	"پ",
+	"ج",
+}
+
 //  {days, leap_days, days_before_start}
 var p_month_count = [12][3]int{
 	{31, 31, 0},   // Farvardin
@@ -148,6 +178,21 @@ func (m Month) String() string {
 // Returns the Persian name of the day in week.
 func (d Weekday) String() string {
 	return days[d]
+}
+
+// Returns the Persian short name of the day in week.
+func (d Weekday) Short() string {
+	return sdays[d]
+}
+
+// Returns the Persian name of the AM_PM.
+func (a AM_PM) String() string {
+	return am_pm[a]
+}
+
+// Returns the Persian short name of the AM_PM.
+func (a AM_PM) Short() string {
+	return s_am_pm[a]
 }
 
 func Time(t time.Time) Time {
@@ -397,6 +442,16 @@ func (t Time) Hour() int {
 	return t.hour
 }
 
+// Returns the hour of t in the range [0, 11].
+func (t Time) Hour12() int {
+	h := t.hour
+	if h >= 12 {
+		h -= 12
+	}
+
+	return h
+}
+
 // Returns the minute offset of t in the range [0, 59].
 func (t Time) Minute() int {
 	return t.min
@@ -423,11 +478,6 @@ func (t Time) YearDay() int {
 	return p_month_count[t.month-1][2] + t.day
 }
 
-// Returns the weekday of t.
-func (t Time) Weekday() Weekday {
-	return t.wday
-}
-
 // Returns the number of remaining days in the year of t.
 func (t Time) RYearDay() int {
 	y := 365
@@ -435,6 +485,11 @@ func (t Time) RYearDay() int {
 		y++
 	}
 	return y - t.YearDay()
+}
+
+// Returns the weekday of t.
+func (t Time) Weekday() Weekday {
+	return t.wday
 }
 
 // Returns the number of remaining days in the month of t.
@@ -454,6 +509,13 @@ func (t Time) FirstWeekDay() Time {
 	return t.AddDate(0, 0, Shanbe-t.wday)
 }
 
+func (t Time) LastWeekday() Time {
+	if t.wday == Jomeh {
+		return t
+	}
+	return t.AddDate(0, 0, Jomeh-t.wday)
+}
+
 func (t Time) FirstMonthDay() Time {
 	if t.day == 1 {
 		return t
@@ -467,13 +529,6 @@ func (t Time) FirstYearDay() Time {
 		return t
 	}
 	return Date(t.year, Farvardin, 1, t.hour, t.min, t.sec, t.nsec, t.loc)
-}
-
-func (t Time) LastWeekday() Time {
-	if t.wday == Jomeh {
-		return t
-	}
-	return t.AddDate(0, 0, Jomeh-t.wday)
 }
 
 func (t Time) LastMonthDay() Time {
@@ -549,7 +604,63 @@ func (t Time) IsLeap() bool {
 	return divider(25*t.year+11, 33) < 8
 }
 
-// Modifies the year, month and day if they were outside their usual ranges.
+func (t Time) AmPm() AM_PM {
+	m := AM
+	if t.hour > 12 || (t.hour == 12 && (t.min > 0 || t.sec > 0)) {
+		m = PM
+	}
+	return m
+}
+
+func (t Time) Format(format string) string {
+	r := strings.NewReplacer(
+		"yyyy", strconv.Itoa(t.year),
+		"yyy", strconv.Itoa(t.year),
+		"yy", strconv.Itoa(t.year)[2:],
+		"y", strconv.Itoa(t.year),
+		"MMM", t.month.String(),
+		"MMD", t.month.Dari(),
+		"MM", fmt.Sprintf("%02d", t.month),
+		"M", strconv.Itoa(t.month),
+		"rw", strconv.Itoa(t.RYearWeek()),
+		"w", strconv.Itoa(t.YearWeek()),
+		"RW", strconv.Itoa(t.RMonthWeek()),
+		"W", strconv.Itoa(t.MonthWeek()),
+		"RD", strconv.Itoa(t.RYearDay()),
+		"D", strconv.Itoa(t.YearDay()),
+		"rd", strconv.Itoa(t.RMonthDay()),
+		"d", strconv.Itoa(t.day),
+		"E", t.wday.String(),
+		"e", t.wday.Short(),
+		"A", t.AmPm().String(),
+		"a", t.AmPm().Short(),
+		"HH", fmt.Sprintf("%02d", t.hour),
+		"H", strconv.Itoa(t.hour),
+		"KK", fmt.Sprintf("%02d", t.Hour12()),
+		"K", strconv.Itoa(t.Hour12()),
+		"kk", fmt.Sprintf("%02d", modifyHour(t.hour, 24)),
+		"k", strconv.Itoa(modifyHour(t.hour, 24)),
+		"hh", fmt.Sprintf("%02d", modifyHour(t.Hour12(), 12)),
+		"h", strconv.Itoa(modifyHour(t.Hour12(), 12)),
+		"mm", fmt.Sprintf("%02d", t.min),
+		"m", strconv.Itoa(t.min),
+		"ns", strconv.Itoa(t.nsec),
+		"ss", fmt.Sprintf("%02d", t.sec),
+		"s", strconv.Itoa(t.sec),
+		"S", strconv.Itoa(t.nsec/1e6),
+		"z", t.loc.String(),
+		"Z", t.loc.String(),
+	)
+	return r.Replace(format)
+}
+
+func modifyHour(value, max int) int {
+	if value == 0 {
+		value = max
+	}
+	return value
+}
+
 func (t *Time) norm() {
 	norm_nanosecond(t)
 	norm_second(t)
