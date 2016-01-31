@@ -279,3 +279,171 @@ func TestTomorrow(t *testing.T) {
 		}
 	}
 }
+
+func TestTimeDays(t *testing.T) {
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
+
+	if ti.Weekday() != Panjshanbeh {
+		t.Error(
+			"For", "Weekday()",
+			"expected", Panjshanbeh.String(),
+			"got", ti.Weekday().String(),
+		)
+	}
+
+	if ti.YearDay() != 188 {
+		t.Error(
+			"For", "YearDay()",
+			"expected", 188,
+			"got", ti.YearDay(),
+		)
+	}
+
+	if ti.RYearDay() != 177 {
+		t.Error(
+			"For", "RYearDay()",
+			"expected", 177,
+			"got", ti.RYearDay(),
+		)
+	}
+
+	if ti.RMonthDay() != 28 {
+		t.Error(
+			"For", "RMonthDay()",
+			"expected", 28,
+			"got", ti.RMonthDay(),
+		)
+	}
+
+	if ti.FirstMonthDay().Weekday() != Charshanbeh {
+		t.Error(
+			"For", "FirstMonthDay().Weekday()",
+			"expected", Charshanbeh.String(),
+			"got", ti.FirstMonthDay().Weekday(),
+		)
+	}
+
+	if ti.LastMonthDay().Weekday() != Panjshanbeh {
+		t.Error(
+			"For", "LastMonthDay().Weekday()",
+			"expected", Panjshanbeh.String(),
+			"got", ti.LastMonthDay().Weekday(),
+		)
+	}
+
+	if ti.FirstYearDay().Weekday() != Shanbeh {
+		t.Error(
+			"For", "FirstYearDay().Weekday()",
+			"expected", Shanbeh.String(),
+			"got", ti.FirstYearDay().Weekday(),
+		)
+	}
+
+	if ti.LastYearDay().Weekday() != Shanbeh {
+		t.Error(
+			"For", "LastYearDay().Weekday()",
+			"expected", Shanbeh.String(),
+			"got", ti.LastYearDay().Weekday(),
+		)
+	}
+
+	if ti.AddDate(0, 0, 20).Weekday() != Charshanbeh {
+		t.Error(
+			"For", "AddDate(0, 0, 20).Weekday()",
+			"expected", Charshanbeh.String(),
+			"got", ti.AddDate(0, 0, 20).Weekday(),
+		)
+	}
+
+	if ti.AddDate(0, 1, 0).Weekday() != Shanbeh {
+		t.Error(
+			"For", "AddDate(0, 1, 0).Weekday()",
+			"expected", Shanbeh.String(),
+			"got", ti.AddDate(0, 1, 0).Weekday(),
+		)
+	}
+
+	if ti.AddDate(2, 0, 0).Weekday() != Yekshanbeh {
+		t.Error(
+			"For", "AddDate(2, 0, 0).Weekday()",
+			"expected", Yekshanbeh.String(),
+			"got", ti.AddDate(2, 0, 0).Weekday(),
+		)
+	}
+
+	if ti.YearWeek() != 27 {
+		t.Error(
+			"For", "YearWeek()",
+			"expected", 27,
+			"got", ti.YearWeek(),
+		)
+	}
+
+	if ti.RYearWeek() != 25 {
+		t.Error(
+			"For", "RYearWeek()",
+			"expected", 25,
+			"got", ti.RYearWeek(),
+		)
+	}
+
+	if ti.MonthWeek() != 1 {
+		t.Error(
+			"For", "MonthWeek()",
+			"expected", 1,
+			"got", ti.MonthWeek(),
+		)
+	}
+
+	if ti.RMonthWeek() != 4 {
+		t.Error(
+			"For", "RMonthWeek()",
+			"expected", 4,
+			"got", ti.RMonthWeek(),
+		)
+	}
+
+	if ti.LastWeekday().Weekday() != Jomeh {
+		t.Error(
+			"For", "LastWeekday().Weekday()",
+			"expected", Jomeh.String(),
+			"got", ti.LastWeekday().Weekday(),
+		)
+	}
+
+	if ti.IsLeap() {
+		t.Error(
+			"For", "IsLeap()",
+			"expected", false,
+			"got", ti.IsLeap(),
+		)
+	}
+}
+
+func TestFormat(t *testing.T)  {
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 50260050, Iran)
+
+	s := ti.Format("d MMM yyyy")
+	if s != "2 مهر 1394" {
+		t.Error(
+			"Expected", "2 مهر 1394",
+			"got", s,
+		)
+	}
+
+	s = ti.Format("d MMI yyyy")
+	if s != "2 میزان 1394" {
+		t.Error(
+			"Expected", "2 میزان 1394",
+			"got", s,
+		)
+	}
+
+	s = ti.Format("yyyy yyy yy y MM M dd d HH H kk k hh h KK K S ns Z")
+	if s != "1394 1394 94 1394 07 7 02 2 12 12 12 12 12 12 00 0 050 50260050 +03:30" {
+		t.Error(
+			"Expected", "1394 1394 94 1394 07 7 02 2 12 12 12 12 12 12 00 0 050 50260050 +03:30",
+			"got", s,
+		)
+	}
+}

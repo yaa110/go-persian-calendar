@@ -600,22 +600,22 @@ func (t Time) LastYearDay() Time {
 
 // Returns the week of month of t.
 func (t Time) MonthWeek() int {
-	return t.day / 7
+	return int(math.Ceil(float64(t.day) / 7.0))
 }
 
 // Returns the number of remaining weeks of the month of t.
 func (t Time) RMonthWeek() int {
-	return t.RMonthDay() / 7
+	return int(math.Ceil(float64(t.RMonthDay()) / 7.0))
 }
 
 // Returns the week of year of t.
 func (t Time) YearWeek() int {
-	return t.YearDay() / 7
+	return int(math.Ceil(float64(t.YearDay()) / 7.0))
 }
 
 // Returns the number of remaining weeks of the year of t.
 func (t Time) RYearWeek() int {
-	return t.RYearDay() / 7
+	return 52 - t.YearWeek()
 }
 
 // Returns a new instance of Time representing a day before the day of t.
