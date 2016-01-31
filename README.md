@@ -118,4 +118,4 @@ pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یکشنبه 09:54:30
 ```
 
 ## Documentation
-Use [GoDoc documentation](https://godoc.org/github.com/yaa110/go-persian-calendar/ptime) for more information about methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `AM_PM`.
+Use [GoDoc documentation](https://godoc.org/github.com/yaa110/go-persian-calendar/ptime) for more information about methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `ptime.AM_PM`.
