@@ -34,18 +34,33 @@ type Time struct {
 }
 
 const (
-	Farvardin, Hamal Month = 1 + iota
-	Ordibehesht, Sur
-	Khordad, Jauza
-	Tir, Saratan
-	Mordad, Asad
-	Shahrivar, Sonboleh
-	Mehr, Mizan
-	Aban, Aqrab
-	Azar, Qos
-	Dey, Jady
-	Bahman, Dolv
-	Esfand, Hut
+	Farvardin Month = 1 + iota
+	Ordibehesht
+	Khordad
+	Tir
+	Mordad
+	Shahrivar
+	Mehr
+	Aban
+	Azar
+	Dey
+	Bahman
+	Esfand
+)
+
+const (
+	Hamal Month = 1 + iota
+	Sur
+	Jauza
+	Saratan
+	Asad
+	Sonboleh
+	Mizan
+	Aqrab
+	Qos
+	Jady
+	Dolv
+	Hut
 )
 
 const (
@@ -58,9 +73,10 @@ const (
 	Jomeh
 )
 
+// Locations based on Iran and Afghanistan time zones.
 var (
-	TEHRAN, _ = time.LoadLocation("Asia/Tehran")
-	KABUL, _ = time.LoadLocation("Asia/Kabul")
+	Iran, _ = time.LoadLocation("Asia/Tehran")
+	Afghanistan, _ = time.LoadLocation("Asia/Kabul")
 )
 
 var months = [12]string{
@@ -399,7 +415,7 @@ func (t Time) Location() *time.Location {
 
 // Returns the day in the year of t.
 func (t Time) YearDay() int {
-	return p_month_count[t.month][2] + t.day
+	return p_month_count[t.month - 1][2] + t.day
 }
 
 // Returns the weekday of t.
@@ -409,20 +425,20 @@ func (t Time) Weekday() Weekday {
 
 // Returns the number of remaining days in the year of t.
 func (t Time) RYearDay() int {
-	// TODO RYearDay
-	return 0
+	y := 365
+	if t.IsLeap() {
+		y++
+	}
+	return y - t.YearDay()
 }
 
 // Returns the number of remaining days in the month of t.
 func (t Time) RMonthDay() int {
-	// TODO RMonthDay
-	return 0
-}
-
-// Returns the number of remaining days in the week of t.
-func (t Time) RWeekday() int {
-	// TODO RWeekday
-	return 0
+	i := 0
+	if t.IsLeap() {
+		i = 1
+	}
+	return p_month_count[t.month - 1][i] - t.day
 }
 
 func (t Time) FirstWeekDay() Time {
