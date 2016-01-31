@@ -12,6 +12,11 @@ type pMonthName struct {
 	name string
 }
 
+type amPmName struct {
+	ap AM_PM
+	name string
+}
+
 type pdate struct {
 	year int
 	month Month
@@ -57,6 +62,16 @@ var month_dari_names = []pMonthName {
 	{Jady, "جدی"},
 	{Dolv, "دلو"},
 	{Hut, "حوت"},
+}
+
+var am_pm_names = []amPmName {
+	{AM, "قبل از ظهر"},
+	{PM, "بعد از ظهر"},
+}
+
+var am_pm_snames = []amPmName {
+	{AM, "ق.ظ"},
+	{PM, "ب.ظ"},
 }
 
 var date_conversions = []dateConversion {
@@ -120,6 +135,28 @@ func TestDariMonthName(t *testing.T)  {
 	}
 }
 
+func TestAmPmName(t *testing.T)  {
+	for _, p := range am_pm_names {
+		if p.ap.String() != p.name {
+			t.Error(
+				"Expected", p.name,
+				"got", p.ap.String(),
+			)
+		}
+	}
+}
+
+func TestAmPmShortName(t *testing.T)  {
+	for _, p := range am_pm_snames {
+		if p.ap.Short() != p.name {
+			t.Error(
+				"Expected", p.name,
+				"got", p.ap.Short(),
+			)
+		}
+	}
+}
+
 func TestLocations(t *testing.T) {
 	if (Iran.String() != "Asia/Tehran") {
 		t.Error(
@@ -163,5 +200,30 @@ func TestGregorianToPersian(t *testing.T) {
 				"got", fmt.Sprintf("%d %s %d", pt.Year(), pt.Month().String(), pt.Day()),
 			)
 		}
+	}
+}
+
+func TestToUnixTimeStamp(t *testing.T) {
+	pu := Now(Iran).Unix()
+	tu := time.Now().In(Iran).Unix()
+	if (pu != tu) {
+		t.Error(
+			"Expected", tu,
+			"got", pu,
+		)
+	}
+}
+
+func TestFromUnixTimeStamp(t *testing.T) {
+	tu := time.Now().In(Iran).Unix()
+	now := Now(Iran)
+
+	fu := Unix(tu, int64(now.Nanosecond()), Iran)
+
+	if (fu.String() != now.String()) {
+		t.Error(
+			"Expected", now.String(),
+			"got", fu.String(),
+		)
 	}
 }
