@@ -280,7 +280,7 @@ func TestTomorrow(t *testing.T) {
 	}
 }
 
-func TestTimeDays(t *testing.T) {
+func TestWeekday(t *testing.T) {
 	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
 
 	if ti.Weekday() != Panjshanbeh {
@@ -290,6 +290,10 @@ func TestTimeDays(t *testing.T) {
 			"got", ti.Weekday().String(),
 		)
 	}
+}
+
+func TestYearDay(t *testing.T) {
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
 
 	if ti.YearDay() != 188 {
 		t.Error(
@@ -306,6 +310,10 @@ func TestTimeDays(t *testing.T) {
 			"got", ti.RYearDay(),
 		)
 	}
+}
+
+func TestRMonthDay(t *testing.T) {
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
 
 	if ti.RMonthDay() != 28 {
 		t.Error(
@@ -314,6 +322,10 @@ func TestTimeDays(t *testing.T) {
 			"got", ti.RMonthDay(),
 		)
 	}
+}
+
+func TestFirstLast(t *testing.T) {
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
 
 	if ti.FirstMonthDay().Weekday() != Charshanbeh {
 		t.Error(
@@ -347,6 +359,18 @@ func TestTimeDays(t *testing.T) {
 		)
 	}
 
+	if ti.LastWeekday().Weekday() != Jomeh {
+		t.Error(
+			"For", "LastWeekday().Weekday()",
+			"expected", Jomeh.String(),
+			"got", ti.LastWeekday().Weekday(),
+		)
+	}
+}
+
+func TestAddDate(t *testing.T) {
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
+
 	if ti.AddDate(0, 0, 20).Weekday() != Charshanbeh {
 		t.Error(
 			"For", "AddDate(0, 0, 20).Weekday()",
@@ -370,6 +394,10 @@ func TestTimeDays(t *testing.T) {
 			"got", ti.AddDate(2, 0, 0).Weekday(),
 		)
 	}
+}
+
+func TestWeeks(t *testing.T) {
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
 
 	if ti.YearWeek() != 27 {
 		t.Error(
@@ -400,14 +428,6 @@ func TestTimeDays(t *testing.T) {
 			"For", "RMonthWeek()",
 			"expected", 4,
 			"got", ti.RMonthWeek(),
-		)
-	}
-
-	if ti.LastWeekday().Weekday() != Jomeh {
-		t.Error(
-			"For", "LastWeekday().Weekday()",
-			"expected", Jomeh.String(),
-			"got", ti.LastWeekday().Weekday(),
 		)
 	}
 
