@@ -1,15 +1,15 @@
 package ptime_test
 
 import (
+	"fmt"
+	. "github.com/yaa110/go-persian-calendar/ptime"
 	"testing"
 	"time"
-	. "github.com/yaa110/go-persian-calendar/ptime"
-	"fmt"
 )
 
 type pMonthName struct {
 	month Month
-	name string
+	name  string
 }
 
 type amPmName struct {
@@ -18,19 +18,19 @@ type amPmName struct {
 }
 
 type pdate struct {
-	year int
+	year  int
 	month Month
-	day int
+	day   int
 }
 
 type gdate struct {
-	year int
+	year  int
 	month time.Month
-	day int
+	day   int
 }
 
 type dateConversion struct {
-	persian pdate
+	persian   pdate
 	gregorian gdate
 }
 
@@ -39,7 +39,7 @@ type dayFunctions struct {
 	day2 pdate
 }
 
-var monthPersianNames = []pMonthName {
+var monthPersianNames = []pMonthName{
 	{Farvardin, "فروردین"},
 	{Ordibehesht, "اردیبهشت"},
 	{Khordad, "خرداد"},
@@ -54,7 +54,7 @@ var monthPersianNames = []pMonthName {
 	{Esfand, "اسفند"},
 }
 
-var monthDariNames = []pMonthName {
+var monthDariNames = []pMonthName{
 	{Hamal, "حمل"},
 	{Sur, "ثور"},
 	{Jauza, "جوزا"},
@@ -69,52 +69,52 @@ var monthDariNames = []pMonthName {
 	{Hut, "حوت"},
 }
 
-var amPmNames = []amPmName {
+var amPmNames = []amPmName{
 	{Am, "قبل از ظهر"},
 	{Pm, "بعد از ظهر"},
 }
 
-var amPmSNames = []amPmName {
+var amPmSNames = []amPmName{
 	{Am, "ق.ظ"},
 	{Pm, "ب.ظ"},
 }
 
-var dateConversions = []dateConversion {
+var dateConversions = []dateConversion{
 	{
-		persian:    pdate{1383, Tir, 15},
-		gregorian:  gdate{2004, time.July, 5},
+		persian:   pdate{1383, Tir, 15},
+		gregorian: gdate{2004, time.July, 5},
 	},
 	{
-		persian:    pdate{1394, Dey, 11},
-		gregorian:  gdate{2016, time.January, 1},
+		persian:   pdate{1394, Dey, 11},
+		gregorian: gdate{2016, time.January, 1},
 	},
 	{
-		persian:    pdate{1394, Esfand, 9},
-		gregorian:  gdate{2016, time.February, 28},
+		persian:   pdate{1394, Esfand, 9},
+		gregorian: gdate{2016, time.February, 28},
 	},
 	{
-		persian:    pdate{1394, Esfand, 11},
-		gregorian:  gdate{2016, time.March, 1},
+		persian:   pdate{1394, Esfand, 11},
+		gregorian: gdate{2016, time.March, 1},
 	},
 	{
-		persian:    pdate{1394, Esfand, 29},
-		gregorian:  gdate{2016, time.March, 19},
+		persian:   pdate{1394, Esfand, 29},
+		gregorian: gdate{2016, time.March, 19},
 	},
 	{
-		persian:    pdate{1395, Farvardin, 1},
-		gregorian:  gdate{2016, time.March, 20},
+		persian:   pdate{1395, Farvardin, 1},
+		gregorian: gdate{2016, time.March, 20},
 	},
 	{
-		persian:    pdate{1395, Farvardin, 2},
-		gregorian:  gdate{2016, time.March, 21},
+		persian:   pdate{1395, Farvardin, 2},
+		gregorian: gdate{2016, time.March, 21},
 	},
 	{
-		persian:    pdate{1395, Farvardin, 3},
-		gregorian:  gdate{2016, time.March, 22},
+		persian:   pdate{1395, Farvardin, 3},
+		gregorian: gdate{2016, time.March, 22},
 	},
 	{
-		persian:    pdate{1395, Dey, 11},
-		gregorian:  gdate{2016, time.December, 31},
+		persian:   pdate{1395, Dey, 11},
+		gregorian: gdate{2016, time.December, 31},
 	},
 }
 
@@ -137,7 +137,7 @@ var dayFunctionsSlice = []dayFunctions{
 	},
 }
 
-func TestPersianMonthName(t *testing.T)  {
+func TestPersianMonthName(t *testing.T) {
 	for _, p := range monthPersianNames {
 		if p.month.String() != p.name {
 			t.Error(
@@ -148,7 +148,7 @@ func TestPersianMonthName(t *testing.T)  {
 	}
 }
 
-func TestDariMonthName(t *testing.T)  {
+func TestDariMonthName(t *testing.T) {
 	for _, p := range monthDariNames {
 		if p.month.Dari() != p.name {
 			t.Error(
@@ -159,7 +159,7 @@ func TestDariMonthName(t *testing.T)  {
 	}
 }
 
-func TestAmPmName(t *testing.T)  {
+func TestAmPmName(t *testing.T) {
 	for _, p := range amPmNames {
 		if p.ap.String() != p.name {
 			t.Error(
@@ -170,7 +170,7 @@ func TestAmPmName(t *testing.T)  {
 	}
 }
 
-func TestAmPmShortName(t *testing.T)  {
+func TestAmPmShortName(t *testing.T) {
 	for _, p := range amPmSNames {
 		if p.ap.Short() != p.name {
 			t.Error(
@@ -230,7 +230,7 @@ func TestGregorianToPersian(t *testing.T) {
 func TestToUnixTimeStamp(t *testing.T) {
 	pu := Now(Iran).Unix()
 	tu := time.Now().In(Iran).Unix()
-	if (pu != tu) {
+	if pu != tu {
 		t.Error(
 			"Expected", tu,
 			"got", pu,
@@ -420,7 +420,7 @@ func TestTimeDays(t *testing.T) {
 	}
 }
 
-func TestFormat(t *testing.T)  {
+func TestFormat(t *testing.T) {
 	ti := Date(1394, Mehr, 2, 12, 59, 59, 50260050, Iran)
 
 	s := ti.Format("d MMM yyyy")
