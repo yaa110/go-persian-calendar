@@ -13,7 +13,7 @@ type pMonthName struct {
 }
 
 type amPmName struct {
-	ap AM_PM
+	ap   AmPm
 	name string
 }
 
@@ -70,13 +70,13 @@ var month_dari_names = []pMonthName {
 }
 
 var am_pm_names = []amPmName {
-	{AM, "قبل از ظهر"},
-	{PM, "بعد از ظهر"},
+	{Am, "قبل از ظهر"},
+	{Pm, "بعد از ظهر"},
 }
 
 var am_pm_snames = []amPmName {
-	{AM, "ق.ظ"},
-	{PM, "ب.ظ"},
+	{Am, "ق.ظ"},
+	{Pm, "ب.ظ"},
 }
 
 var date_conversions = []dateConversion {
