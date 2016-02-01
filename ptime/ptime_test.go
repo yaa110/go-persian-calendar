@@ -39,7 +39,7 @@ type dayFunctions struct {
 	day2 pdate
 }
 
-var month_persian_names = []pMonthName {
+var monthPersianNames = []pMonthName {
 	{Farvardin, "فروردین"},
 	{Ordibehesht, "اردیبهشت"},
 	{Khordad, "خرداد"},
@@ -54,7 +54,7 @@ var month_persian_names = []pMonthName {
 	{Esfand, "اسفند"},
 }
 
-var month_dari_names = []pMonthName {
+var monthDariNames = []pMonthName {
 	{Hamal, "حمل"},
 	{Sur, "ثور"},
 	{Jauza, "جوزا"},
@@ -69,17 +69,17 @@ var month_dari_names = []pMonthName {
 	{Hut, "حوت"},
 }
 
-var am_pm_names = []amPmName {
+var amPmNames = []amPmName {
 	{Am, "قبل از ظهر"},
 	{Pm, "بعد از ظهر"},
 }
 
-var am_pm_snames = []amPmName {
+var amPmSNames = []amPmName {
 	{Am, "ق.ظ"},
 	{Pm, "ب.ظ"},
 }
 
-var date_conversions = []dateConversion {
+var dateConversions = []dateConversion {
 	{
 		persian:    pdate{1383, Tir, 15},
 		gregorian:  gdate{2004, time.July, 5},
@@ -118,7 +118,7 @@ var date_conversions = []dateConversion {
 	},
 }
 
-var day_functions = []dayFunctions{
+var dayFunctionsSlice = []dayFunctions{
 	{
 		pdate{1394, Tir, 31},
 		pdate{1394, Mordad, 1},
@@ -138,7 +138,7 @@ var day_functions = []dayFunctions{
 }
 
 func TestPersianMonthName(t *testing.T)  {
-	for _, p := range month_persian_names {
+	for _, p := range monthPersianNames {
 		if p.month.String() != p.name {
 			t.Error(
 				"Expected", p.name,
@@ -149,7 +149,7 @@ func TestPersianMonthName(t *testing.T)  {
 }
 
 func TestDariMonthName(t *testing.T)  {
-	for _, p := range month_dari_names {
+	for _, p := range monthDariNames {
 		if p.month.Dari() != p.name {
 			t.Error(
 				"Expected", p.name,
@@ -160,7 +160,7 @@ func TestDariMonthName(t *testing.T)  {
 }
 
 func TestAmPmName(t *testing.T)  {
-	for _, p := range am_pm_names {
+	for _, p := range amPmNames {
 		if p.ap.String() != p.name {
 			t.Error(
 				"Expected", p.name,
@@ -171,7 +171,7 @@ func TestAmPmName(t *testing.T)  {
 }
 
 func TestAmPmShortName(t *testing.T)  {
-	for _, p := range am_pm_snames {
+	for _, p := range amPmSNames {
 		if p.ap.Short() != p.name {
 			t.Error(
 				"Expected", p.name,
@@ -200,7 +200,7 @@ func TestLocations(t *testing.T) {
 }
 
 func TestPersianToGregorian(t *testing.T) {
-	for _, p := range date_conversions {
+	for _, p := range dateConversions {
 		gt := Date(p.persian.year, p.persian.month, p.persian.day, 11, 59, 59, 0, Iran).Time()
 
 		if gt.Year() != p.gregorian.year || gt.Month() != p.gregorian.month || gt.Day() != p.gregorian.day {
@@ -214,7 +214,7 @@ func TestPersianToGregorian(t *testing.T) {
 }
 
 func TestGregorianToPersian(t *testing.T) {
-	for _, p := range date_conversions {
+	for _, p := range dateConversions {
 		pt := New(time.Date(p.gregorian.year, p.gregorian.month, p.gregorian.day, 11, 59, 59, 0, Iran))
 
 		if pt.Year() != p.persian.year || pt.Month() != p.persian.month || pt.Day() != p.persian.day {
@@ -253,7 +253,7 @@ func TestFromUnixTimeStamp(t *testing.T) {
 }
 
 func TestYesterday(t *testing.T) {
-	for _, p := range day_functions {
+	for _, p := range dayFunctionsSlice {
 		day := Date(p.day2.year, p.day2.month, p.day2.day, 12, 59, 59, 0, Iran)
 		yesterday := day.Yesterday()
 		if yesterday.Year() != p.day1.year || yesterday.Month() != p.day1.month || yesterday.Day() != p.day1.day {
@@ -267,7 +267,7 @@ func TestYesterday(t *testing.T) {
 }
 
 func TestTomorrow(t *testing.T) {
-	for _, p := range day_functions {
+	for _, p := range dayFunctionsSlice {
 		day := Date(p.day1.year, p.day1.month, p.day1.day, 12, 59, 59, 0, Iran)
 		tomorrow := day.Tomorrow()
 		if tomorrow.Year() != p.day2.year || tomorrow.Month() != p.day2.month || tomorrow.Day() != p.day2.day {
