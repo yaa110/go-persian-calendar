@@ -4,7 +4,7 @@ Go Persian Calendar
 [![goreportcard](http://goreportcard.com/badge/yaa110/go-persian-calendar)](http://goreportcard.com/report/yaa110/go-persian-calendar)
 
 ## About
-**Go Persian Calendar v0.1** provides functionality for conversion among Persian (Solar Hijri) and Gregorian calendars. A Julian calendar is used as an interface for all conversions. The package name is `ptime` and it is compatible with the package [time](https://golang.org/pkg/time). All months are available with both Iranian and Dari Persian names. This source code is licensed under MIT license that can be found in the LICENSE file.
+**Go Persian Calendar v0.2** provides functionality for conversion among Persian (Solar Hijri) and Gregorian calendars. A Julian calendar is used as an interface for all conversions. The package name is `ptime` and it is compatible with the package [time](https://golang.org/pkg/time). All months are available with both Iranian and Dari Persian names. This source code is licensed under MIT license that can be found in the LICENSE file.
 
 ## Installation
 First install [Go SDK](https://golang.org/dl) and set up your [GOPATH](http://golang.org/doc/code.html#GOPATH), then use the following command to install and get `ptime.a` package inside `$GOPATH/pkg` directory.
