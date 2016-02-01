@@ -366,7 +366,7 @@ func (t *Time) SetUnix(sec, nsec int64, loc *time.Location) {
 // loc is a pointer to time.Location and must not be nil.
 func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *time.Location) {
 	if loc == nil {
-		panic("ptime: the Location must not be nil in call to Change")
+		panic("ptime: the Location must not be nil in call to Set")
 	}
 
 	t.year = year
