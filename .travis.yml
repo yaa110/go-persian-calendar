@@ -1,4 +1,3 @@
-// Travis CI for Go Persian Calendar
 language: go
 
 go:
@@ -9,7 +8,7 @@ go:
     - tip
 
 install:
-    - go build -v ptime/ptime.go
+    - go build ptime/ptime.go
 
 script:
-    - go test -v ptime/ptime.go
+    - go test ptime/ptime.go
