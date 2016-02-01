@@ -292,19 +292,19 @@ func Now(loc *time.Location) Time {
 	return New(time.Now().In(loc))
 }
 
-// SetTime sets pt to the time of t.
-func (pt *Time) SetTime(t time.Time) {
+// SetTime sets t to the time of ti.
+func (t *Time) SetTime(ti time.Time) {
 	var year, month, day int
 
-	pt.nsec = t.Nanosecond()
-	pt.sec = t.Second()
-	pt.min = t.Minute()
-	pt.hour = t.Hour()
-	pt.loc = t.Location()
-	pt.wday = getWeekday(t.Weekday())
+	t.nsec = ti.Nanosecond()
+	t.sec = ti.Second()
+	t.min = ti.Minute()
+	t.hour = ti.Hour()
+	t.loc = ti.Location()
+	t.wday = getWeekday(ti.Weekday())
 
 	var jdn int
-	gy, gmm, gd := t.Date()
+	gy, gmm, gd := ti.Date()
 	gm := int(gmm)
 
 	if gy > 1582 || (gy == 1582 && gm > 10) || (gy == 1582 && gm == 10 && gd > 14) {
@@ -330,7 +330,7 @@ func (pt *Time) SetTime(t time.Time) {
 		year = year - 1
 	}
 
-	var dy float64 = float64(jdn - getJdn(year, 1, 1) + 1)
+	var dy = float64(jdn - getJdn(year, 1, 1) + 1)
 	if dy <= 186 {
 		month = int(math.Ceil(dy / 31.0))
 	} else {
@@ -339,9 +339,9 @@ func (pt *Time) SetTime(t time.Time) {
 
 	day = jdn - getJdn(year, month, 1) + 1
 
-	pt.year = year
-	pt.month = Month(month)
-	pt.day = day
+	t.year = year
+	t.month = Month(month)
+	t.day = day
 }
 
 // SetUnix sets t to represent the corresponding unix timestamp of
@@ -680,7 +680,7 @@ func (t Time) Zone() (string, int) {
 	return t.Time().Zone()
 }
 
-// roneOffset Returns the zone offset of t in the format of [+|-]HH:mm.
+// ZoneOffset returns the zone offset of t in the format of [+|-]HH:mm.
 func (t Time) ZoneOffset() string {
 	_, offset := t.Zone()
 
