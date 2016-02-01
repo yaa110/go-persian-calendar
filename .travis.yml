@@ -1,3 +1,4 @@
+// Travis CI for Go Persian Calendar
 language: go
 
 go:
