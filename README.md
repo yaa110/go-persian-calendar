@@ -1,6 +1,5 @@
 Go Persian Calendar
 ===================
-The implementation of the Persian (Solar Hijri) Calendar in Go (golang)
 
 [![goreportcard](http://goreportcard.com/badge/yaa110/go-persian-calendar)](http://goreportcard.com/report/yaa110/go-persian-calendar)
 
