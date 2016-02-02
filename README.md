@@ -90,7 +90,7 @@ fmt.Println(pt.MonthWeek()) // output: 3
 fmt.Println(pt.YearWeek()) // output: 46
 
 // Get the number of remaining weeks of the year
-fmt.Println(pt.YearWeek()) // output: 6
+fmt.Println(pt.RYearWeek()) // output: 6
 ```
 
 5- Format the time.
