@@ -1,7 +1,7 @@
 Go Persian Calendar
 ===================
 
-[![godoc](https://img.shields.io/badge/go%20doc-reference-blue.svg)](https://godoc.org/github.com/yaa110/go-persian-calendar/ptime) [![goreportcard](http://goreportcard.com/badge/yaa110/go-persian-calendar)](http://goreportcard.com/report/yaa110/go-persian-calendar) [![Build Status](https://travis-ci.org/yaa110/go-persian-calendar.svg?branch=master)](https://travis-ci.org/yaa110/go-persian-calendar) [![wercker status](https://app.wercker.com/status/e325dc7b37da5eea531acbcb4ae5fa31/s/master "wercker status")](https://app.wercker.com/project/bykey/e325dc7b37da5eea531acbcb4ae5fa31)
+[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/yaa110/go-persian-calendar/ptime) [![goreportcard](http://goreportcard.com/badge/yaa110/go-persian-calendar)](http://goreportcard.com/report/yaa110/go-persian-calendar) [![Build Status](https://travis-ci.org/yaa110/go-persian-calendar.svg?branch=master)](https://travis-ci.org/yaa110/go-persian-calendar)
 
 ## About
 **Go Persian Calendar v0.2** provides functionality for conversion among Persian (Solar Hijri) and Gregorian calendars. A Julian calendar is used as an interface for all conversions. The package name is `ptime` and it is compatible with the package [time](https://golang.org/pkg/time). All months are available with both Iranian and Dari Persian names. This source code is licensed under MIT license that can be found in the LICENSE file.
@@ -69,8 +69,20 @@ fmt.Println(pt.Unix()) // output: 1454277270
 
 // Get yesterday, today and tomorrow
 fmt.Println(pt.Yesterday().Weekday()) // output: شنبه
-fmt.Println(pt.Weekday()) // output: یکشنبه
+fmt.Println(pt.Weekday()) // output: یک‌شنبه
 fmt.Println(pt.Tomorrow().Weekday()) // output: دوشنبه
+
+// Get First and last day of week
+fmt.Println(pt.FirstWeekDay().Date()) // output: 1394 بهمن 10
+fmt.Println(pt.LastWeekday().Date()) // output: 1394 بهمن 16
+
+// Get First and last day of month
+fmt.Println(pt.FirstMonthDay().Weekday()) // output: پنج‌شنبه
+fmt.Println(pt.LastMonthDay().Weekday()) // output: جمعه
+
+// Get First and last day of year
+fmt.Println(pt.FirstYearDay().Weekday()) // output: شنبه
+fmt.Println(pt.LastYearDay().Weekday()) // output: شنبه
 ```
 
 5- Format the time.
@@ -79,7 +91,7 @@ fmt.Println(pt.Tomorrow().Weekday()) // output: دوشنبه
 // Get a new instance of ptime.Time using Unix timestamp
 pt := ptime.Unix(1454277270, 0, ptime.Iran)
 
-pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یکشنبه 09:54:30 ب.ظ
+pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یک‌شنبه 09:54:30 ب.ظ
 
 // yyyy, yyy, y     year (e.g. 1394)
 // yy               2-digits representation of year (e.g. 94)

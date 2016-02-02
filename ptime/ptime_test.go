@@ -153,7 +153,7 @@ func TestDariMonthName(t *testing.T) {
 		if p.month.Dari() != p.name {
 			t.Error(
 				"Expected", p.name,
-				"got", p.month.String(),
+				"got", p.month.Dari(),
 			)
 		}
 	}
