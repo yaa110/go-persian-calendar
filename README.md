@@ -83,6 +83,15 @@ fmt.Println(pt.LastMonthDay().Weekday()) // output: جمعه
 // Get First and last day of year
 fmt.Println(pt.FirstYearDay().Weekday()) // output: شنبه
 fmt.Println(pt.LastYearDay().Weekday()) // output: شنبه
+
+// Get the week of month
+fmt.Println(pt.MonthWeek()) // output: 3
+
+// Get the week of year
+fmt.Println(pt.YearWeek()) // output: 46
+
+// Get the number of remaining weeks of the year
+fmt.Println(pt.YearWeek()) // output: 6
 ```
 
 5- Format the time.
