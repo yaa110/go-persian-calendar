@@ -423,14 +423,6 @@ func TestWeeks(t *testing.T) {
 		)
 	}
 
-	if ti.RMonthWeek() != 4 {
-		t.Error(
-			"For", "RMonthWeek()",
-			"expected", 4,
-			"got", ti.RMonthWeek(),
-		)
-	}
-
 	if ti.IsLeap() {
 		t.Error(
 			"For", "IsLeap()",

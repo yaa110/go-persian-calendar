@@ -618,12 +618,7 @@ func (t Time) LastYearDay() Time {
 
 // MonthWeek returns the week of month of t.
 func (t Time) MonthWeek() int {
-	return int(math.Ceil(float64(t.day) / 7.0))
-}
-
-// RMonthWeek returns the number of remaining weeks of the month of t.
-func (t Time) RMonthWeek() int {
-	return int(math.Ceil(float64(t.RMonthDay()) / 7.0))
+	return int(math.Ceil(float64(t.day+int(t.FirstMonthDay().Weekday())) / 7.0))
 }
 
 // YearWeek returns the week of year of t.
@@ -744,7 +739,6 @@ func (t Time) Format(format string) string {
 		"M", strconv.Itoa(int(t.month)),
 		"rw", strconv.Itoa(t.RYearWeek()),
 		"w", strconv.Itoa(t.YearWeek()),
-		"RW", strconv.Itoa(t.RMonthWeek()),
 		"W", strconv.Itoa(t.MonthWeek()),
 		"RD", strconv.Itoa(t.RYearDay()),
 		"D", strconv.Itoa(t.YearDay()),
