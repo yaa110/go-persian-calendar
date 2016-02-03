@@ -109,7 +109,6 @@ pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یک‌شنبه 09:54
 // M                month (e.g. 1)
 // rw               remaining weeks of year
 // w                week of year
-// RW               remaining weeks of month
 // W                week of month
 // RD               remaining days of year
 // D                day of year
