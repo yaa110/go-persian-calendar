@@ -8,8 +8,8 @@ Go Persian Calendar
 ## Installation
 First install [Go SDK](https://golang.org/dl) and set up your [GOPATH](http://golang.org/doc/code.html#GOPATH), then use the following command to install `ptime`.
 
-```
-$ go get -u github.com/yaa110/go-persian-calendar/ptime
+```sh
+$ go get github.com/yaa110/go-persian-calendar/ptime
 ```
 
 ## Getting started
