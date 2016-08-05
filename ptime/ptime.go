@@ -1,6 +1,6 @@
 // In the name of Allah
 
-// Persian Calendar v0.2
+// Persian Calendar v0.3
 // Please visit https://github.com/yaa110/go-persian-calendar for more information.
 //
 // Copyright (c) 2016 Navid Fathollahzade
