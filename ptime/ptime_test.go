@@ -182,26 +182,26 @@ func TestAmPmShortName(t *testing.T) {
 }
 
 func TestLocations(t *testing.T) {
-	if Iran.String() != "Asia/Tehran" {
+	if Iran().String() != "Asia/Tehran" {
 		t.Error(
 			"For", "Iran",
 			"expected", "Asia/Tehran",
-			"got", Iran.String(),
+			"got", Iran().String(),
 		)
 	}
 
-	if Afghanistan.String() != "Asia/Kabul" {
+	if Afghanistan().String() != "Asia/Kabul" {
 		t.Error(
 			"For", "Afghanistan",
 			"expected", "Asia/Kabul",
-			"got", Iran.String(),
+			"got", Afghanistan().String(),
 		)
 	}
 }
 
 func TestPersianToGregorian(t *testing.T) {
 	for _, p := range dateConversions {
-		gt := Date(p.persian.year, p.persian.month, p.persian.day, 11, 59, 59, 0, Iran).Time()
+		gt := Date(p.persian.year, p.persian.month, p.persian.day, 11, 59, 59, 0, Iran()).Time()
 
 		if gt.Year() != p.gregorian.year || gt.Month() != p.gregorian.month || gt.Day() != p.gregorian.day {
 			t.Error(
@@ -215,7 +215,7 @@ func TestPersianToGregorian(t *testing.T) {
 
 func TestGregorianToPersian(t *testing.T) {
 	for _, p := range dateConversions {
-		pt := New(time.Date(p.gregorian.year, p.gregorian.month, p.gregorian.day, 11, 59, 59, 0, Iran))
+		pt := New(time.Date(p.gregorian.year, p.gregorian.month, p.gregorian.day, 11, 59, 59, 0, Iran()))
 
 		if pt.Year() != p.persian.year || pt.Month() != p.persian.month || pt.Day() != p.persian.day {
 			t.Error(
@@ -228,8 +228,8 @@ func TestGregorianToPersian(t *testing.T) {
 }
 
 func TestToUnixTimeStamp(t *testing.T) {
-	pu := Now(Iran).Unix()
-	tu := time.Now().In(Iran).Unix()
+	pu := Now(Iran()).Unix()
+	tu := time.Now().In(Iran()).Unix()
 	if pu != tu {
 		t.Error(
 			"Expected", tu,
@@ -239,10 +239,10 @@ func TestToUnixTimeStamp(t *testing.T) {
 }
 
 func TestFromUnixTimeStamp(t *testing.T) {
-	tu := time.Now().In(Iran).Unix()
-	now := Now(Iran)
+	tu := time.Now().In(Iran()).Unix()
+	now := Now(Iran())
 
-	fu := Unix(tu, int64(now.Nanosecond()), Iran)
+	fu := Unix(tu, int64(now.Nanosecond()), Iran())
 
 	if fu.String() != now.String() {
 		t.Error(
@@ -254,7 +254,7 @@ func TestFromUnixTimeStamp(t *testing.T) {
 
 func TestYesterday(t *testing.T) {
 	for _, p := range dayFunctionsSlice {
-		day := Date(p.day2.year, p.day2.month, p.day2.day, 12, 59, 59, 0, Iran)
+		day := Date(p.day2.year, p.day2.month, p.day2.day, 12, 59, 59, 0, Iran())
 		yesterday := day.Yesterday()
 		if yesterday.Year() != p.day1.year || yesterday.Month() != p.day1.month || yesterday.Day() != p.day1.day {
 			t.Error(
@@ -268,7 +268,7 @@ func TestYesterday(t *testing.T) {
 
 func TestTomorrow(t *testing.T) {
 	for _, p := range dayFunctionsSlice {
-		day := Date(p.day1.year, p.day1.month, p.day1.day, 12, 59, 59, 0, Iran)
+		day := Date(p.day1.year, p.day1.month, p.day1.day, 12, 59, 59, 0, Iran())
 		tomorrow := day.Tomorrow()
 		if tomorrow.Year() != p.day2.year || tomorrow.Month() != p.day2.month || tomorrow.Day() != p.day2.day {
 			t.Error(
@@ -281,7 +281,7 @@ func TestTomorrow(t *testing.T) {
 }
 
 func TestWeekday(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
 
 	if ti.Weekday() != Panjshanbeh {
 		t.Error(
@@ -293,7 +293,7 @@ func TestWeekday(t *testing.T) {
 }
 
 func TestYearDay(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
 
 	if ti.YearDay() != 188 {
 		t.Error(
@@ -313,7 +313,7 @@ func TestYearDay(t *testing.T) {
 }
 
 func TestRMonthDay(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
 
 	if ti.RMonthDay() != 28 {
 		t.Error(
@@ -325,7 +325,7 @@ func TestRMonthDay(t *testing.T) {
 }
 
 func TestFirstLast(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
 
 	if ti.FirstMonthDay().Weekday() != Charshanbeh {
 		t.Error(
@@ -369,7 +369,7 @@ func TestFirstLast(t *testing.T) {
 }
 
 func TestAddDate(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
 
 	if ti.AddDate(0, 0, 20).Weekday() != Charshanbeh {
 		t.Error(
@@ -397,7 +397,7 @@ func TestAddDate(t *testing.T) {
 }
 
 func TestWeeks(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran)
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
 
 	if ti.YearWeek() != 27 {
 		t.Error(
@@ -433,7 +433,7 @@ func TestWeeks(t *testing.T) {
 }
 
 func TestFormat(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 50260050, Iran)
+	ti := Date(1394, Mehr, 2, 12, 59, 59, 50260050, Iran())
 
 	s := ti.Format("d MMM yyyy")
 	if s != "2 مهر 1394" {
