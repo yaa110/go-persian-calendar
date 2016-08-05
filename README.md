@@ -3,7 +3,7 @@ Go Persian Calendar
 
 [![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/yaa110/go-persian-calendar/ptime) [![Build Status](https://travis-ci.org/yaa110/go-persian-calendar.svg)](https://travis-ci.org/yaa110/go-persian-calendar) [![goreportcard](https://img.shields.io/badge/go%20report-A%2B-brightgreen.svg)](http://goreportcard.com/report/yaa110/go-persian-calendar) [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/yaa110/go-persian-calendar/blob/master/LICENSE)
 
-**Go Persian Calendar v0.2** provides functionality for conversion among Persian (Solar Hijri) and Gregorian calendars. A Julian calendar is used as an interface for all conversions. The package name is `ptime` and it is compatible with the package [time](https://golang.org/pkg/time). All months are available with both Iranian and Dari Persian names. This source code is licensed under MIT license that can be found in the LICENSE file.
+**Go Persian Calendar v0.3** provides functionality for conversion among Persian (Solar Hijri) and Gregorian calendars. A Julian calendar is used as an interface for all conversions. The package name is `ptime` and it is compatible with the package [time](https://golang.org/pkg/time). All months are available with both Iranian and Dari Persian names. This source code is licensed under MIT license that can be found in the LICENSE file.
 
 ## Installation
 First install [Go SDK](https://golang.org/dl) and set up your [GOPATH](http://golang.org/doc/code.html#GOPATH), then use the following command to install `ptime`.
@@ -11,6 +11,9 @@ First install [Go SDK](https://golang.org/dl) and set up your [GOPATH](http://go
 ```sh
 $ go get github.com/yaa110/go-persian-calendar/ptime
 ```
+
+## Changelog
+- **v0.3** `ptime.Iran` and `ptime.Afghanistan` changed to `ptime.Iran()` and `ptime.Afghanistan()`, respectively, to support DST.
 
 ## Getting started
 1- Import the package `ptime`. Most of the time you need to import `time` and `fmt` packages, too.
@@ -27,7 +30,7 @@ import (
 
 ```go
 // Create a new instance of time.Time
-var t time.Time = time.Date(2016, time.January, 1, 12, 1, 1, 0, ptime.Iran)
+var t time.Time = time.Date(2016, time.January, 1, 12, 1, 1, 0, ptime.Iran())
 
 // Get a new instance of ptime.Time using time.Time
 pt := ptime.New(t)
@@ -40,7 +43,7 @@ fmt.Println(pt.Date()) // output: 1394 دی 11
 
 ```go
 // Create a new instance of ptime.Time
-var pt ptime.Time = ptime.Date(1394, ptime.Mehr, 2, 12, 59, 59, 0, ptime.Iran)
+var pt ptime.Time = ptime.Date(1394, ptime.Mehr, 2, 12, 59, 59, 0, ptime.Iran())
 
 // Get a new instance of time.Time
 t := pt.Time()
@@ -53,7 +56,7 @@ fmt.Println(t.Date()) // output: 2015 September 24
 
 ```go
 // Get a new instance of ptime.Time representing the current time
-pt := ptime.Now(ptime.Iran)
+pt := ptime.Now(ptime.Iran())
 
 // Get year, month, day
 fmt.Println(pt.Date()) // output: 1394 بهمن 11
@@ -97,7 +100,7 @@ fmt.Println(pt.RYearWeek()) // output: 6
 
 ```go
 // Get a new instance of ptime.Time using Unix timestamp
-pt := ptime.Unix(1454277270, 0, ptime.Iran)
+pt := ptime.Unix(1454277270, 0, ptime.Iran())
 
 pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یک‌شنبه 09:54:30 ب.ظ
 
