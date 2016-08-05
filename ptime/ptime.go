@@ -88,12 +88,6 @@ const (
 	Pm
 )
 
-// Pointers to time.Location for Iran and Afghanistan time zones.
-var (
-	Iran        = time.FixedZone("Asia/Tehran", 12600) // UTC + 03:30
-	Afghanistan = time.FixedZone("Asia/Kabul", 16200)  // UTC + 04:30
-)
-
 var amPm = [2]string{
 	"قبل از ظهر",
 	"بعد از ظهر",
@@ -168,6 +162,24 @@ var pMonthCount = [12][3]int{
 	{30, 30, 276}, // Dey
 	{30, 30, 306}, // Bahman
 	{29, 30, 336}, // Esfand
+}
+
+// Iran returns a pointer to time.Location of Asia/Tehran
+func Iran() *time.Location {
+	loc, err := time.LoadLocation("Asia/Tehran")
+	if err != nil {
+		loc = time.FixedZone("Asia/Tehran", 12600) // UTC + 03:30
+	}
+	return loc
+}
+
+// Afghanistan returns a pointer to time.Location of Asia/Kabul
+func Afghanistan() *time.Location {
+	loc, err := time.LoadLocation("Asia/Kabul")
+	if err != nil {
+		loc = time.FixedZone("Asia/Kabul", 16200) // UTC + 04:30
+	}
+	return loc
 }
 
 // Returns t in RFC3339Nano format.
