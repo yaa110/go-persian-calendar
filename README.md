@@ -13,7 +13,8 @@ $ go get github.com/yaa110/go-persian-calendar/ptime
 ```
 
 ## Changelog
-- **v0.3** `ptime.Iran` and `ptime.Afghanistan` changed to `ptime.Iran()` and `ptime.Afghanistan()`, respectively.
+**v0.3**
+-`ptime.Iran` and `ptime.Afghanistan` changed to `ptime.Iran()` and `ptime.Afghanistan()`, respectively.
 
 ## Getting started
 1- Import the package `ptime`. Most of the time you need to import `time` and `fmt` packages, too.
