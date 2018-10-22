@@ -635,7 +635,7 @@ func (t Time) MonthWeek() int {
 
 // YearWeek returns the week of year of t.
 func (t Time) YearWeek() int {
-	return int(math.Ceil(float64(t.YearDay()) / 7.0))
+	return int(math.Ceil(float64(float64(t.YearDay())+float64(t.FirstYearDay().Weekday())) / 7.0))
 }
 
 // RYearWeek returns the number of remaining weeks of the year of t.
