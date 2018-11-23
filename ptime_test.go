@@ -2,9 +2,10 @@ package ptime_test
 
 import (
 	"fmt"
-	. "github.com/yaa110/go-persian-calendar/ptime"
 	"testing"
 	"time"
+
+	. "github.com/yaa110/go-persian-calendar/ptime"
 )
 
 type pMonthName struct {

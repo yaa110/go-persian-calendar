@@ -1,15 +1,13 @@
 language: go
 
 go:
-    - 1.2
-    - 1.3
-    - 1.4
-    - 1.5
-    - tip
+    - 1.11.2
 
-install:
-    - go build ptime/ptime.go
+os:
+  - linux
+
+install: true
 
 script:
-    - cd ptime
-    - go test
+    - env GO111MODULE=on go build
+    - env GO111MODULE=on go test
