@@ -1,19 +1,26 @@
 Go Persian Calendar
 ===================
 
-[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/yaa110/go-persian-calendar/ptime) [![Build Status](https://travis-ci.org/yaa110/go-persian-calendar.svg)](https://travis-ci.org/yaa110/go-persian-calendar) [![goreportcard](https://img.shields.io/badge/go%20report-A%2B-brightgreen.svg)](http://goreportcard.com/report/yaa110/go-persian-calendar) [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/yaa110/go-persian-calendar/blob/master/LICENSE)
+[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/yaa110/go-persian-calendar) [![Build Status](https://travis-ci.org/yaa110/go-persian-calendar.svg)](https://travis-ci.org/yaa110/go-persian-calendar) [![goreportcard](https://img.shields.io/badge/go%20report-A%2B-brightgreen.svg)](http://goreportcard.com/report/yaa110/go-persian-calendar) [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/yaa110/go-persian-calendar/blob/master/LICENSE)
 
 **Go Persian Calendar v0.3.1** provides functionality for conversion among Persian (Solar Hijri) and Gregorian calendars. A Julian calendar is used as an interface for all conversions. The package name is `ptime` and it is compatible with the package [time](https://golang.org/pkg/time). All months are available with both Iranian and Dari Persian names. This source code is licensed under MIT license that can be found in the LICENSE file.
 
 ## Installation
-First install [Go SDK](https://golang.org/dl) and set up your [GOPATH](http://golang.org/doc/code.html#GOPATH), then use the following command to install `ptime`.
 
-```sh
-$ go get github.com/yaa110/go-persian-calendar/ptime
+- Add `ptime` to `go.mod`:
+
+```
+require github.com/yaa110/go-persian-calendar/ptime v0.3.1
 ```
 
 ## Changelog
+
+**v0.3.1**
+
+- Use Go modules
+
 **v0.3**
+
 - `ptime.Iran` and `ptime.Afghanistan` changed to `ptime.Iran()` and `ptime.Afghanistan()`, respectively.
 
 ## Getting started
@@ -142,4 +149,4 @@ pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یک‌شنبه 09:54
 ```
 
 ## Documentation
-Use [GoDoc documentation](https://godoc.org/github.com/yaa110/go-persian-calendar/ptime) for more information about methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `ptime.AmPm`.
+Use [GoDoc documentation](https://godoc.org/github.com/yaa110/go-persian-calendar) for more information about methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `ptime.AmPm`.
