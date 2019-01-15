@@ -34,7 +34,7 @@ import ptime github.com/yaa110/go-persian-calendar
 
 ```go
 import (
-    "github.com/yaa110/go-persian-calendar/ptime"
+    ptime "github.com/yaa110/go-persian-calendar"
     "time"
     "fmt"
 )
