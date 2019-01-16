@@ -10,14 +10,14 @@ Go Persian Calendar
 This assumes you're using go modules, and have set up your `go.mod` file,
 possibly using `go mod init`.
 
--- Import it in your code:
+- Import it in your code:
 
 ```
 import ptime github.com/yaa110/go-persian-calendar
 ```
 
--- Building using `go build` will now automatically get go-persian-calendar and
-   update your `go.mod``
+- Building using `go build` will now automatically get `go-persian-calendar` and
+   update your `go.mod`
 
 ## Changelog
 
