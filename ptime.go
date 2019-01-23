@@ -670,7 +670,8 @@ func (t Time) Since(t2 Time) int64 {
 
 // IsLeap returns true if the year of t is a leap year.
 func (t Time) IsLeap() bool {
-	return divider(25*t.year+11, 33) < 8
+	b := 1303 // b is a base leap-year.
+	return (t.year-b)%4 == 0
 }
 
 // AmPm returns the 12-Hour marker of t.
@@ -839,13 +840,6 @@ func between(value *int, min, max int) {
 	} else if *value > max {
 		*value = max
 	}
-}
-
-func divider(num, den int) int {
-	if num > 0 {
-		return num % den
-	}
-	return num - ((((num + 1) / den) - 1) * den)
 }
 
 func getJdn(year int, month int, day int) int {
