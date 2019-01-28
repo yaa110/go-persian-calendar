@@ -380,7 +380,6 @@ func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *ti
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to Set")
 	}
-
 	t.year = year
 	t.month = month
 	t.day = day
@@ -397,47 +396,47 @@ func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *ti
 // SetYear sets the year of t.
 func (t *Time) SetYear(year int) {
 	t.year = year
-	normDay(t)
+	t.normDay()
 	t.resetWeekday()
 }
 
 // SetMonth sets the month of t.
 func (t *Time) SetMonth(month Month) {
 	t.month = month
-	normMonth(t)
-	normDay(t)
+	t.normMonth()
+	t.normDay()
 	t.resetWeekday()
 }
 
 // SetDay sets the day of t.
 func (t *Time) SetDay(day int) {
 	t.day = day
-	normDay(t)
+	t.normDay()
 	t.resetWeekday()
 }
 
 // SetHour sets the hour of t.
 func (t *Time) SetHour(hour int) {
 	t.hour = hour
-	normHour(t)
+	t.normHour()
 }
 
 // SetMinute sets the minute offset of t.
 func (t *Time) SetMinute(min int) {
 	t.min = min
-	normMinute(t)
+	t.normMinute()
 }
 
 // SetSecond sets the second offset of t.
 func (t *Time) SetSecond(sec int) {
 	t.sec = sec
-	normSecond(t)
+	t.normSecond()
 }
 
 // SetNanosecond sets the nanosecond offset of t.
 func (t *Time) SetNanosecond(nsec int) {
 	t.nsec = nsec
-	normNanosecond(t)
+	t.normNanosecond()
 }
 
 // In sets the location of t.
@@ -454,14 +453,10 @@ func (t *Time) In(loc *time.Location) {
 
 // At sets the hour, min minute, sec second and nsec nanoseconds offsets of t.
 func (t *Time) At(hour, min, sec, nsec int) {
-	t.hour = hour
-	t.min = min
-	t.sec = sec
-	t.nsec = nsec
-	normHour(t)
-	normMinute(t)
-	normSecond(t)
-	normNanosecond(t)
+	t.SetHour(hour)
+	t.SetMinute(min)
+	t.SetSecond(sec)
+	t.SetNanosecond(nsec)
 }
 
 // Unix returns the number of seconds since January 1, 1970 UTC.
@@ -594,13 +589,10 @@ func (t Time) LastMonthDay() Time {
 	if t.IsLeap() {
 		i = 1
 	}
-
 	ld := pMonthCount[t.month-1][i]
-
 	if ld == t.day {
 		return t
 	}
-
 	return Date(t.year, t.month, ld, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
@@ -618,13 +610,10 @@ func (t Time) LastYearDay() Time {
 	if t.IsLeap() {
 		i = 1
 	}
-
 	ld := pMonthCount[Esfand-1][i]
-
 	if t.month == Esfand && t.day == ld {
 		return t
 	}
-
 	return Date(t.year, Esfand, ld, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
@@ -781,48 +770,48 @@ func (t Time) Format(format string) string {
 	return r.Replace(format)
 }
 
-func modifyHour(value, max int) int {
-	if value == 0 {
-		value = max
-	}
-	return value
-}
-
 func (t *Time) norm() {
-	normNanosecond(t)
-	normSecond(t)
-	normMinute(t)
-	normHour(t)
-	normMonth(t)
-	normDay(t)
+	t.normNanosecond()
+	t.normSecond()
+	t.normMinute()
+	t.normHour()
+	t.normMonth()
+	t.normDay()
 }
 
-func normNanosecond(t *Time) {
+func (t *Time)normNanosecond() {
 	between(&t.nsec, 0, 999999999)
 }
 
-func normSecond(t *Time) {
+func (t *Time)normSecond() {
 	between(&t.sec, 0, 59)
 }
 
-func normMinute(t *Time) {
+func (t *Time)normMinute() {
 	between(&t.min, 0, 59)
 }
 
-func normHour(t *Time) {
+func (t *Time)normHour() {
 	between(&t.hour, 0, 23)
 }
 
-func normMonth(t *Time) {
+func (t *Time)normMonth() {
 	betweenMonth(&t.month, Farvardin, Esfand)
 }
 
-func normDay(t *Time) {
+func (t *Time)normDay() {
 	i := 0
 	if t.IsLeap() {
 		i = 1
 	}
 	between(&t.day, 1, pMonthCount[t.month-1][i])
+}
+
+func modifyHour(value, max int) int {
+	if value == 0 {
+		value = max
+	}
+	return value
 }
 
 func betweenMonth(value *Month, min, max Month) {
