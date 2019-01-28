@@ -779,27 +779,27 @@ func (t *Time) norm() {
 	t.normDay()
 }
 
-func (t *Time)normNanosecond() {
+func (t *Time) normNanosecond() {
 	between(&t.nsec, 0, 999999999)
 }
 
-func (t *Time)normSecond() {
+func (t *Time) normSecond() {
 	between(&t.sec, 0, 59)
 }
 
-func (t *Time)normMinute() {
+func (t *Time) normMinute() {
 	between(&t.min, 0, 59)
 }
 
-func (t *Time)normHour() {
+func (t *Time) normHour() {
 	between(&t.hour, 0, 23)
 }
 
-func (t *Time)normMonth() {
+func (t *Time) normMonth() {
 	betweenMonth(&t.month, Farvardin, Esfand)
 }
 
-func (t *Time)normDay() {
+func (t *Time) normDay() {
 	i := 0
 	if t.IsLeap() {
 		i = 1
