@@ -182,7 +182,7 @@ func Afghanistan() *time.Location {
 	return loc
 }
 
-// Returns t in RFC3339Nano format.
+// String returns t in RFC3339Nano format.
 func (t Time) String() string {
 	return t.Format("yyyy-MM-ddTHH:mm:ss.nsZ")
 }
@@ -192,12 +192,12 @@ func (m Month) Dari() string {
 	return dmonths[m-1]
 }
 
-// Returns the Persian name of the month.
+// String returns the Persian name of the month.
 func (m Month) String() string {
 	return months[m-1]
 }
 
-// Returns the Persian name of the day in week.
+// String returns the Persian name of the day in week.
 func (d Weekday) String() string {
 	return days[d]
 }
@@ -207,7 +207,7 @@ func (d Weekday) Short() string {
 	return sdays[d]
 }
 
-// Returns the Persian name of 12-Hour marker.
+// String returns the Persian name of 12-Hour marker.
 func (a AmPm) String() string {
 	return amPm[a]
 }
