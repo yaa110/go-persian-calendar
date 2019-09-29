@@ -369,6 +369,40 @@ func (t *Time) SetUnix(sec, nsec int64, loc *time.Location) {
 	t.SetTime(time.Unix(sec, nsec).In(loc))
 }
 
+// norm returns nhi, nlo such that
+//	hi * base + lo == nhi * base + nlo
+//	0 <= nlo < base
+func norm(hi, lo, base int) (nhi, nlo int) {
+	if lo < 0 {
+		n := (-lo-1)/base + 1
+		hi -= n
+		lo += n * base
+	}
+	if lo >= base {
+		n := lo / base
+		hi += n
+		lo -= n * base
+	}
+	return hi, lo
+}
+
+// norm returns nhi, nlo such that
+//	hi * base + lo == nhi * base + nlo
+//	0 <= nlo < base
+func normDay(hi, lo, base int) (nhi, nlo int) {
+	if lo < 1 {
+		n := (-lo-1)/base + 1
+		hi -= n
+		lo += n * base
+	}
+	if lo > base {
+		n := lo / base
+		hi += n
+		lo -= n * base
+	}
+	return hi, lo
+}
+
 // Set sets t.
 //
 // year, month and day represent a day in Persian calendar.
@@ -380,6 +414,23 @@ func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *ti
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to Set")
 	}
+
+	// Normalize nsec, sec, min, hour, overflowing into day.
+	sec, nsec = norm(sec, nsec, 1e9)
+	min, sec = norm(min, sec, 60)
+	hour, min = norm(hour, min, 60)
+	day, hour = norm(day, hour, 24)
+
+	// Normalize month, overflowing into year.
+	m := int(month) - 1
+	year, m = norm(year, m, 12)
+	if divider(25*year+11, 33) < 8 {
+		m, day = normDay(m, day, pMonthCount[m][1])
+	} else {
+		m, day = normDay(m, day, pMonthCount[m][0])
+	}
+	year, m = norm(year, m, 12)
+	month = Month(m) + 1
 	t.year = year
 	t.month = month
 	t.day = day
@@ -649,7 +700,8 @@ func (t Time) Add(d time.Duration) Time {
 
 // AddDate returns a new instance of Time for t.year+years, t.month+months and t.day+days.
 func (t Time) AddDate(years, months, days int) Time {
-	return New(t.Time().AddDate(years, months, days))
+	t.Set(t.year+years, Month(int(t.month)+months), t.day+days, t.hour, t.min, t.sec, t.nsec, t.loc)
+	return t
 }
 
 // Since returns the number of seconds between t and t2.
