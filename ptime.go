@@ -372,7 +372,7 @@ func (t *Time) SetUnix(sec, nsec int64, loc *time.Location) {
 // norm returns nhi, nlo such that
 //	hi * base + lo == nhi * base + nlo
 //	0 <= nlo < base
-func norm(hi, lo, base int) (nhi, nlo int) {
+func norm(hi, lo, base int) (int, int) {
 	if lo < 0 {
 		n := (-lo-1)/base + 1
 		hi -= n
@@ -389,7 +389,7 @@ func norm(hi, lo, base int) (nhi, nlo int) {
 // norm returns nhi, nlo such that
 //	hi * base + lo == nhi * base + nlo
 //	0 <= nlo < base
-func normDay(hi, lo, base int) (nhi, nlo int) {
+func normDay(hi, lo, base int) (int, int) {
 	if lo < 1 {
 		n := (-lo-1)/base + 1
 		hi -= n
@@ -424,7 +424,7 @@ func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *ti
 	// Normalize month, overflowing into year.
 	m := int(month) - 1
 	year, m = norm(year, m, 12)
-	if divider(25*year+11, 33) < 8 {
+	if isLeap(year) {
 		m, day = normDay(m, day, pMonthCount[m][1])
 	} else {
 		m, day = normDay(m, day, pMonthCount[m][0])
@@ -711,7 +711,11 @@ func (t Time) Since(t2 Time) int64 {
 
 // IsLeap returns true if the year of t is a leap year.
 func (t Time) IsLeap() bool {
-	return divider(25*t.year+11, 33) < 8
+	return isLeap(t.year)
+}
+
+func isLeap(year int) bool {
+	return divider(25*year+11, 33) < 8
 }
 
 // AmPm returns the 12-Hour marker of t.
