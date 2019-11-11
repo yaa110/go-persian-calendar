@@ -336,6 +336,14 @@ func TestFirstLast(t *testing.T) {
 		)
 	}
 
+	if ti.BeginningOfMonth().Weekday() != Charshanbeh {
+		t.Error(
+			"For", "BeginningOfMonth().Weekday()",
+			"expected", Charshanbeh.String(),
+			"got", ti.BeginningOfMonth().Weekday(),
+		)
+	}
+
 	if ti.LastMonthDay().Weekday() != Panjshanbeh {
 		t.Error(
 			"For", "LastMonthDay().Weekday()",
@@ -349,6 +357,14 @@ func TestFirstLast(t *testing.T) {
 			"For", "FirstYearDay().Weekday()",
 			"expected", Shanbeh.String(),
 			"got", ti.FirstYearDay().Weekday(),
+		)
+	}
+
+	if ti.BeginningOfYear().Weekday() != Shanbeh {
+		t.Error(
+			"For", "BeginningOfYear().Weekday()",
+			"expected", Shanbeh.String(),
+			"got", ti.BeginningOfYear().Weekday(),
 		)
 	}
 
