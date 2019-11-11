@@ -608,6 +608,17 @@ func (t Time) RMonthDay() int {
 	return pMonthCount[t.month-1][i] - t.day
 }
 
+// BeginningOfWeek returns a new instance of Time representing the first day of the week of t.
+// The time is reset to 00:00:00
+func (t Time) BeginningOfWeek() Time {
+	nt := t.AddDate(0, 0, int(Shanbeh-t.wday))
+	nt.SetHour(0)
+	nt.SetMinute(0)
+	nt.SetSecond(0)
+	nt.SetNanosecond(0)
+	return nt
+}
+
 // FirstWeekDay returns a new instance of Time representing the first day of the week of t.
 func (t Time) FirstWeekDay() Time {
 	if t.wday == Shanbeh {
