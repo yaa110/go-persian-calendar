@@ -664,6 +664,12 @@ func (t Time) LastMonthDay() Time {
 	return Date(t.year, t.month, ld, t.hour, t.min, t.sec, t.nsec, t.loc)
 }
 
+// BeginningOfYear returns a new instance of Time representing the first day of the year of t.
+// The time is reset to 00:00:00
+func (t Time) BeginningOfYear() Time {
+	return Date(t.year, Farvardin, 1, 0, 0, 0, 0, t.loc)
+}
+
 // FirstYearDay returns a new instance of Time representing the first day of the year of t.
 func (t Time) FirstYearDay() Time {
 	if t.month == Farvardin && t.day == 1 {
