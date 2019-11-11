@@ -736,6 +736,10 @@ func (t Time) Zone() (string, int) {
 func (t Time) ZoneOffset() string {
 	_, offset := t.Zone()
 
+	if offset == 0 {
+		return "Z"
+	}
+
 	sign := "+"
 	if offset < 0 {
 		sign = "-"
