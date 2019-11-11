@@ -21,6 +21,11 @@ import ptime github.com/yaa110/go-persian-calendar
 
 ## Changelog
 
+**v0.5.0**
+
+- Add `BeginningOfWeek`, `BeginningOfMonth` and `BeginningOfYear` methods.
+- Format UTC timezone by `Z` instead of `+00:00`
+
 **v0.4.1**
 
 - Refactor code
