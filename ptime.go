@@ -756,11 +756,29 @@ func (t Time) Zone() (string, int) {
 }
 
 // ZoneOffset returns the zone offset of t in the format of [+|-]HH:mm.
-func (t Time) ZoneOffset() string {
+// format need time format
+func (t Time) ZoneOffset(f ...string) string {
+	format := "-07:00"
+	if len(f) > 0 {
+		format = f[0]
+		if format != "-0700" && format != "-07" && format != "-07:00" && format != "Z0700" && format != "Z07:00" {
+			format = "-07:00"
+		}
+	}
+
 	_, offset := t.Zone()
 
 	if offset == 0 {
-		return "Z"
+		switch format {
+		case "-0700":
+			return "+0000"
+		case "-07":
+			return "+00"
+		case "-07:00":
+			return "+00:00"
+		case "Z0700", "Z07:00":
+			return "Z"
+		}
 	}
 
 	sign := "+"
@@ -771,7 +789,14 @@ func (t Time) ZoneOffset() string {
 	h := offset / 3600
 	m := (offset - h*3600) / 60
 
-	return fmt.Sprintf("%s%02d:%02d", sign, h, m)
+	switch format {
+	case "-0700", "Z0700":
+		return fmt.Sprintf("%s%02d%02d", sign, h, m)
+	case "-07":
+		return fmt.Sprintf("%s%02d", sign, h)
+	default:
+		return fmt.Sprintf("%s%02d:%02d", sign, h, m)
+	}
 }
 
 // Format returns the formatted representation of t.
@@ -851,6 +876,125 @@ func (t Time) Format(format string) string {
 		"Z", t.ZoneOffset(),
 	)
 	return r.Replace(format)
+}
+
+// TimeFormat format in go lang time package style
+//
+// 2006			four digit year (e.g. 1399)
+// 06			two digit year (e.g. 99)
+// 01			two digit month (e.g. 01)
+// 1			one digit month (e.g. 1)
+// Jan			month name (e.g. آذر)
+// January		month name (e.g. آذر)
+// 02			two digit day (e.g. 07)
+// 2			one digit day (e.g. 7)
+// _2			right justified two character day (e.g.  7)
+// Mon			weekday (e.g. شنبه)
+// Monday		weekday (e.g. شنبه)
+// 03			two digit 12 hour format (e.g. 03)
+// 3			one digit 12 hour format (e.g. 3)
+// 15			two digit 24 hour format (e.g. 15)
+// 04			two digit minute (e.g. 03)
+// 4			one digit minute (e.g. 03)
+// 05			two digit minute (e.g. 09)
+// 5			one digit minute (e.g. 9)
+// .000			millisecond (e.g. .120)
+// .000000		microsecond (e.g. .123400)
+// .000000000	nanosecond (e.g. .123456000)
+// .999			trailing zeros removed millisecond (e.g. .12)
+// .999999		trailing zeros removed microsecond (e.g. .1234)
+// .999999999	trailing zeros removed nanosecond (e.g. .123456)
+// PM			full 12-Hour marker (e.g. قبل از ظهر)
+// pm 			short 12-Hour marker (e.g. ق.ظ)
+// MST			the name of location
+// 	-0700		zone offset (e.g. +0330)
+// 	-07			zone offset (e.g. +03)
+// 	-07:00		zone offset (e.g. +03:30)
+// 	Z0700		zone offset (e.g. +0330)
+// 	Z07:00		zone offset (e.g. +03:30)
+func (t Time) TimeFormat(format string) string {
+	initializer := []string{
+		"January", "{MMMM}",
+		"Jan", "{MMM}",
+		"Monday", "{WD}",
+		"Mon", "{W}",
+		".000000000", "{ns}",
+		".000000", "{ms}",
+		".000", "{mls}",
+		".999999999", "{nst}",
+		".999999", "{mst}",
+		".999", "{mlst}",
+		"2006", "{YYYY}",
+		"PM", "{AFTER}",
+		"pm", "{after}",
+		"MST", "{LOC}",
+		"Z0700", "{Z0700}",
+		"Z07:00", "{Z07:00}",
+		"-0700", "{-0700}",
+		"-07:00", "{-07:00}",
+		"-07", "{-07}",
+		"15", "{HH}",
+		"06", "{YY}",
+		"01", "{MM}",
+		"02", "{DD}",
+		"03", "{hh}",
+		"04", "{mm}",
+		"05", "{ss}",
+		"_2", "{_D}",
+		"1", "{M}",
+		"2", "{D}",
+		"3", "{h}",
+		"4", "{m}",
+		"5", "{s}",
+	}
+
+	r := strings.NewReplacer(initializer...)
+	formatted := r.Replace(format)
+
+	params := []string{
+		"{YYYY}", strconv.Itoa(t.year),
+		"{YY}", strconv.Itoa(t.year)[2:],
+		"{MMMM}", t.locMonthName(),
+		"{MMM}", t.locMonthName(),
+		"{MM}", fmt.Sprintf("%02d", int(t.month)),
+		"{M}", strconv.Itoa(int(t.month)),
+		"{DD}", fmt.Sprintf("%02d", t.day),
+		"{_D}", fmt.Sprintf("%2d", t.day),
+		"{D}", strconv.Itoa(t.day),
+		"{WD}", t.wday.String(),
+		"{W}", t.wday.Short(),
+		"{HH}", fmt.Sprintf("%02d", t.hour),
+		"{hh}", fmt.Sprintf("%02d", t.Hour12()),
+		"{h}", strconv.Itoa(t.Hour12()),
+		"{mm}", fmt.Sprintf("%02d", t.min),
+		"{m}", strconv.Itoa(t.min),
+		"{ss}", fmt.Sprintf("%02d", t.sec),
+		"{s}", strconv.Itoa(t.sec),
+		"{ns}", "." + strconv.Itoa(t.nsec),
+		"{ms}", "." + strconv.Itoa(t.nsec)[:6],
+		"{mls}", "." + strconv.Itoa(t.nsec)[:3],
+		"{nst}", strings.TrimRight("."+strconv.Itoa(t.nsec), "0"),
+		"{mst}", strings.TrimRight("."+strconv.Itoa(t.nsec)[:6], "0"),
+		"{mlst}", strings.TrimRight("."+strconv.Itoa(t.nsec)[:3], "0"),
+		"{AFTER}", t.AmPm().String(),
+		"{after}", t.AmPm().Short(),
+		"{LOC}", t.loc.String(),
+		"{Z0700}", t.ZoneOffset("Z0700"),
+		"{Z07:00}", t.ZoneOffset("Z07:00"),
+		"{-0700}", t.ZoneOffset("-0700"),
+		"{-07:00}", t.ZoneOffset("-07:00"),
+		"{-07}", t.ZoneOffset("-07"),
+	}
+
+	r = strings.NewReplacer(params...)
+	return r.Replace(formatted)
+}
+
+func (t *Time) locMonthName() string {
+	if t.Location().String() == Afghanistan().String() {
+		return t.month.Dari()
+	}
+	return t.month.String()
 }
 
 func (t *Time) norm() {
