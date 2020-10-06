@@ -756,7 +756,7 @@ func (t Time) Zone() (string, int) {
 }
 
 // ZoneOffset returns the zone offset of t in the format of [+|-]HH:mm.
-// format need time format
+// If `f` is set, then return format is based on `f`.
 func (t Time) ZoneOffset(f ...string) string {
 	format := "-07:00"
 	if len(f) > 0 {

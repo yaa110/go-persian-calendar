@@ -21,6 +21,10 @@ import ptime github.com/yaa110/go-persian-calendar
 
 ## Changelog
 
+**v0.6.0**
+
+- Support standard time format
+
 **v0.5.0**
 
 - Add `BeginningOfWeek`, `BeginningOfMonth` and `BeginningOfYear` methods.
@@ -129,7 +133,7 @@ fmt.Println(pt.RYearWeek()) // output: 6
 // Get a new instance of ptime.Time using Unix timestamp
 pt := ptime.Unix(1454277270, 0, ptime.Iran())
 
-pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یک‌شنبه 09:54:30 ب.ظ
+fmt.Println(pt.Format("yyyy/MM/dd E hh:mm:ss a")) // output: 1394/11/11 یک‌شنبه 09:54:30 ب.ظ
 
 // yyyy, yyy, y     year (e.g. 1394)
 // yy               2-digits representation of year (e.g. 94)
@@ -165,6 +169,47 @@ pt.Format("yyyy/MM/dd E hh:mm:ss a") // output: 1394/11/11 یک‌شنبه 09:54
 // S                3-digits representation of milliseconds (e.g. 001)
 // z                the name of location
 // Z                zone offset (e.g. +03:30)
+```
+
+6- Format the time using [standard format](https://golang.org/src/time/format.go).
+
+```go
+pt := ptime.Date(1394, 7, 2, 14, 7, 8, 0, Iran())
+
+fmt.Println(pt.TimeFormat("2 Jan 2006")) // output: 2 مهر 1394
+
+// 2006			four digit year (e.g. 1399)
+// 06			two digit year (e.g. 99)
+// 01			two digit month (e.g. 01)
+// 1			one digit month (e.g. 1)
+// Jan			month name (e.g. آذر)
+// January		month name (e.g. آذر)
+// 02			two digit day (e.g. 07)
+// 2			one digit day (e.g. 7)
+// _2			right justified two character day (e.g.  7)
+// Mon			weekday (e.g. شنبه)
+// Monday		weekday (e.g. شنبه)
+// 03			two digit 12 hour format (e.g. 03)
+// 3			one digit 12 hour format (e.g. 3)
+// 15			two digit 24 hour format (e.g. 15)
+// 04			two digit minute (e.g. 03)
+// 4			one digit minute (e.g. 03)
+// 05			two digit minute (e.g. 09)
+// 5			one digit minute (e.g. 9)
+// .000			millisecond (e.g. .120)
+// .000000		microsecond (e.g. .123400)
+// .000000000	nanosecond (e.g. .123456000)
+// .999			trailing zeros removed millisecond (e.g. .12)
+// .999999		trailing zeros removed microsecond (e.g. .1234)
+// .999999999	trailing zeros removed nanosecond (e.g. .123456)
+// PM			full 12-Hour marker (e.g. قبل از ظهر)
+// pm 			short 12-Hour marker (e.g. ق.ظ)
+// MST			the name of location
+// 	-0700		zone offset (e.g. +0330)
+// 	-07			zone offset (e.g. +03)
+// 	-07:00		zone offset (e.g. +03:30)
+// 	Z0700		zone offset (e.g. +0330)
+// 	Z07:00		zone offset (e.g. +03:30)
 ```
 
 ## Documentation
