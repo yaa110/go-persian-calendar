@@ -7,7 +7,7 @@
 ## Installation
 
 ```bash
-go get github.com/yaa110/go-persian-calendar/v1
+go get github.com/yaa110/go-persian-calendar
 ```
 
 ## Changelog
@@ -47,7 +47,7 @@ go get github.com/yaa110/go-persian-calendar/v1
 
 ```go
 import (
-    ptime "github.com/yaa110/go-persian-calendar/v1"
+    ptime "github.com/yaa110/go-persian-calendar"
     "time"
     "fmt"
 )
@@ -209,4 +209,5 @@ fmt.Println(pt.TimeFormat("2 Jan 2006")) // output: 2 مهر 1394
 ```
 
 ## Documentation
+
 Use [GoDoc documentation](https://godoc.org/github.com/yaa110/go-persian-calendar) for more information about methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `ptime.AmPm`.

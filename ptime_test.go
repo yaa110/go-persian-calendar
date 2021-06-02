@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/yaa110/go-persian-calendar/v1"
+	. "github.com/yaa110/go-persian-calendar"
 )
 
 type pMonthName struct {
