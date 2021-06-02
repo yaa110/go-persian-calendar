@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/yaa110/go-persian-calendar"
+	. "github.com/yaa110/go-persian-calendar/v1"
 )
 
 type pMonthName struct {
@@ -229,8 +229,8 @@ func TestGregorianToPersian(t *testing.T) {
 }
 
 func TestToUnixTimeStamp(t *testing.T) {
-	pu := Now(Iran()).Unix()
-	tu := time.Now().In(Iran()).Unix()
+	pu := Now().Unix()
+	tu := time.Now().Unix()
 	if pu != tu {
 		t.Error(
 			"Expected", tu,
@@ -240,10 +240,10 @@ func TestToUnixTimeStamp(t *testing.T) {
 }
 
 func TestFromUnixTimeStamp(t *testing.T) {
-	tu := time.Now().In(Iran()).Unix()
-	now := Now(Iran())
+	tu := time.Now().Unix()
+	now := Now()
 
-	fu := Unix(tu, int64(now.Nanosecond()), Iran())
+	fu := Unix(tu, int64(now.Nanosecond()))
 
 	if fu.String() != now.String() {
 		t.Error(
@@ -508,7 +508,7 @@ func TestTimeFormat(t *testing.T) {
 		"2":          "2",
 		"_2":         " 2",
 		"Mon":        "پ",
-		"Monday":     "پنج‌شنبه",
+		"Monday":     "پنج\u200cشنبه",
 		"03":         "02",
 		"3":          "2",
 		"15":         "14",

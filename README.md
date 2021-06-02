@@ -1,5 +1,4 @@
-Go Persian Calendar
-===================
+# Go Persian Calendar
 
 [![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/yaa110/go-persian-calendar) [![Build Status](https://travis-ci.org/yaa110/go-persian-calendar.svg)](https://travis-ci.org/yaa110/go-persian-calendar) [![goreportcard](https://img.shields.io/badge/go%20report-A%2B-brightgreen.svg)](http://goreportcard.com/report/yaa110/go-persian-calendar) [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/yaa110/go-persian-calendar/blob/master/LICENSE)
 
@@ -7,51 +6,54 @@ Go Persian Calendar
 
 ## Installation
 
-This assumes you're using go modules, and have set up your `go.mod` file,
-possibly using `go mod init`.
+This assumes you're using go modules, and have set up your `go.mod` file, possibly using `go mod init`.
 
 - Import it in your code:
 
-```
-import ptime github.com/yaa110/go-persian-calendar
+```go
+import ptime github.com/yaa110/go-persian-calendar/v1
 ```
 
-- Building using `go build` will now automatically get `go-persian-calendar` and
-   update your `go.mod`
+- Building using `go build` will now automatically get `go-persian-calendar` and update your `go.mod`
 
 ## Changelog
 
-**v0.6.0**
+### v1.0.0
+
+- Remove `loc *time.Location` argument from `ptime.Unix()`, `ptime.SetUnix()` and `ptime.Now()`
+
+### v0.6.0
 
 - Support standard time format
 
-**v0.5.0**
+### v0.5.0
 
 - Add `BeginningOfWeek`, `BeginningOfMonth` and `BeginningOfYear` methods.
 - Format UTC timezone by `Z` instead of `+00:00`
 
-**v0.4.1**
+### v0.4.1
 
 - Refactor code
 
-**v0.4.0**
+### v0.4.0
 
 - Change module import name
 
-**v0.3.1**
+### v0.3.1
 
 - Use Go modules
 
-**v0.3**
+### v0.3
 
 - `ptime.Iran` and `ptime.Afghanistan` changed to `ptime.Iran()` and `ptime.Afghanistan()`, respectively.
 
 ## Getting started
+
 1- Import the package `ptime`. Most of the time you need to import `time` and `fmt` packages, too.
 
 ```go
 import (
-    ptime "github.com/yaa110/go-persian-calendar"
+    ptime "github.com/yaa110/go-persian-calendar/v1"
     "time"
     "fmt"
 )
@@ -87,7 +89,7 @@ fmt.Println(t.Date()) // output: 2015 September 24
 
 ```go
 // Get a new instance of ptime.Time representing the current time
-pt := ptime.Now(ptime.Iran())
+pt := ptime.Now()
 
 // Get year, month, day
 fmt.Println(pt.Date()) // output: 1394 بهمن 11
@@ -131,7 +133,7 @@ fmt.Println(pt.RYearWeek()) // output: 6
 
 ```go
 // Get a new instance of ptime.Time using Unix timestamp
-pt := ptime.Unix(1454277270, 0, ptime.Iran())
+pt := ptime.Unix(1454277270, 0)
 
 fmt.Println(pt.Format("yyyy/MM/dd E hh:mm:ss a")) // output: 1394/11/11 یک‌شنبه 09:54:30 ب.ظ
 

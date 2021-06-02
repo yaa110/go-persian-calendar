@@ -130,11 +130,11 @@ var dmonths = [12]string{
 
 var days = [7]string{
 	"شنبه",
-	"یک‌شنبه",
+	"یک\u200cشنبه",
 	"دوشنبه",
-	"سه‌شنبه",
+	"سه\u200cشنبه",
 	"چهارشنبه",
-	"پنج‌شنبه",
+	"پنج\u200cشنبه",
 	"جمعه",
 }
 
@@ -283,25 +283,13 @@ func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Locati
 // Unix returns a new instance of PersianDate from unix timestamp.
 //
 // sec seconds and nsec nanoseconds since January 1, 1970 UTC.
-//
-// loc is a pointer to time.Location and must not be nil.
-func Unix(sec, nsec int64, loc *time.Location) Time {
-	if loc == nil {
-		panic("ptime: the Location must not be nil in call to Unix")
-	}
-
-	return New(time.Unix(sec, nsec).In(loc))
+func Unix(sec, nsec int64) Time {
+	return New(time.Unix(sec, nsec))
 }
 
 // Now returns a new instance of Time corresponding to the current time.
-//
-// loc is a pointer to time.Location and must not be nil.
-func Now(loc *time.Location) Time {
-	if loc == nil {
-		panic("ptime: the Location must not be nil in call to Now")
-	}
-
-	return New(time.Now().In(loc))
+func Now() Time {
+	return New(time.Now())
 }
 
 // SetTime sets t to the time of ti.
@@ -359,14 +347,8 @@ func (t *Time) SetTime(ti time.Time) {
 // SetUnix sets t to represent the corresponding unix timestamp of
 //
 // sec seconds and nsec nanoseconds since January 1, 1970 UTC.
-//
-// loc is a pointer to time.Location and must not be nil.
-func (t *Time) SetUnix(sec, nsec int64, loc *time.Location) {
-	if loc == nil {
-		panic("ptime: the Location must not be nil in call to SetUnix")
-	}
-
-	t.SetTime(time.Unix(sec, nsec).In(loc))
+func (t *Time) SetUnix(sec, nsec int64) {
+	t.SetTime(time.Unix(sec, nsec))
 }
 
 // norm returns nhi, nlo such that
