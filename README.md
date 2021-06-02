@@ -11,7 +11,7 @@ This assumes you're using go modules, and have set up your `go.mod` file, possib
 - Import it in your code:
 
 ```go
-import ptime github.com/yaa110/go-persian-calendar/v1
+import ptime "github.com/yaa110/go-persian-calendar/v1"
 ```
 
 - Building using `go build` will now automatically get `go-persian-calendar` and update your `go.mod`
