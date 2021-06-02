@@ -1,3 +1,3 @@
 module github.com/yaa110/go-persian-calendar/v1
 
-go 1.13
+go 1.16

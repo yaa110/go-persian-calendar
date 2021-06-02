@@ -6,15 +6,9 @@
 
 ## Installation
 
-This assumes you're using go modules, and have set up your `go.mod` file, possibly using `go mod init`.
-
-- Import it in your code:
-
-```go
-import ptime "github.com/yaa110/go-persian-calendar/v1"
+```bash
+go get github.com/yaa110/go-persian-calendar/v1
 ```
-
-- Building using `go build` will now automatically get `go-persian-calendar` and update your `go.mod`
 
 ## Changelog
 
