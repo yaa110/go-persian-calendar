@@ -10,37 +10,6 @@
 go get github.com/yaa110/go-persian-calendar
 ```
 
-## Changelog
-
-### v1.0.0
-
-- Remove `loc *time.Location` argument from `ptime.Unix()`, `ptime.SetUnix()` and `ptime.Now()`
-
-### v0.6.0
-
-- Support standard time format
-
-### v0.5.0
-
-- Add `BeginningOfWeek`, `BeginningOfMonth` and `BeginningOfYear` methods.
-- Format UTC timezone by `Z` instead of `+00:00`
-
-### v0.4.1
-
-- Refactor code
-
-### v0.4.0
-
-- Change module import name
-
-### v0.3.1
-
-- Use Go modules
-
-### v0.3
-
-- `ptime.Iran` and `ptime.Afghanistan` changed to `ptime.Iran()` and `ptime.Afghanistan()`, respectively.
-
 ## Getting started
 
 1- Import the package `ptime`. Most of the time you need to import `time` and `fmt` packages, too.
@@ -207,6 +176,37 @@ fmt.Println(pt.TimeFormat("2 Jan 2006")) // output: 2 مهر 1394
 // Z0700       zone offset (e.g. +0330)
 // Z07:00      zone offset (e.g. +03:30)
 ```
+
+## Changelog
+
+### v1.0.0
+
+- Remove `loc *time.Location` argument from `ptime.Unix()`, `ptime.SetUnix()` and `ptime.Now()`
+
+### v0.6.0
+
+- Support standard time format
+
+### v0.5.0
+
+- Add `BeginningOfWeek`, `BeginningOfMonth` and `BeginningOfYear` methods.
+- Format UTC timezone by `Z` instead of `+00:00`
+
+### v0.4.1
+
+- Refactor code
+
+### v0.4.0
+
+- Change module import name
+
+### v0.3.1
+
+- Use Go modules
+
+### v0.3
+
+- `ptime.Iran` and `ptime.Afghanistan` changed to `ptime.Iran()` and `ptime.Afghanistan()`, respectively.
 
 ## Documentation
 
