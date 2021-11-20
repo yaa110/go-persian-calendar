@@ -182,6 +182,26 @@ func TestAmPmShortName(t *testing.T) {
 	}
 }
 
+func TestDateTimeStringToPtime(t *testing.T) {
+	str := "2006-01-02T15:04:05Z"
+	result := "1384-10-12T18:34:05.0+03:30"
+	res, er := DateTimeStringToPtime(str)
+	if er != nil {
+		t.Error(
+			"For", "Error: ",
+			"expected", nil,
+			"got", er,
+		)
+		return
+	}
+	if res.String() != result {
+		t.Error(
+			"For", str,
+			"expected", result,
+			"got", res.String(),
+		)
+	}
+}
 func TestLocations(t *testing.T) {
 	if Iran().String() != "Asia/Tehran" {
 		t.Error(

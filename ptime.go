@@ -164,6 +164,16 @@ var pMonthCount = [12][3]int{
 	{29, 30, 336}, // Esfand
 }
 
+// str ex: 2006-01-02.... time.RFC3339 format ,convert to ptime
+func DateTimeStringToPtime(str string) (*Time, error) {
+	t, er := time.Parse(time.RFC3339, str)
+	if er != nil {
+		return nil, er
+	}
+	pt := New(t, Iran())
+	return &pt, nil
+}
+
 // Iran returns a pointer to time.Location of Asia/Tehran
 func Iran() *time.Location {
 	loc, err := time.LoadLocation("Asia/Tehran")
@@ -222,8 +232,13 @@ func (a AmPm) Short() string {
 // returns a new instance of Time corresponding to the time of t.
 //
 // t is an instance of time.Time in Gregorian calendar.
-func New(t time.Time) Time {
+func New(t time.Time, loc ...*time.Location) Time {
 	pt := new(Time)
+	if len(loc) > 0 {
+		pt.loc = loc[0]
+	} else {
+		pt.loc = Iran()
+	}
 	pt.SetTime(t)
 
 	return *pt
@@ -295,7 +310,7 @@ func Now() Time {
 // SetTime sets t to the time of ti.
 func (t *Time) SetTime(ti time.Time) {
 	var year, month, day int
-
+	ti = ti.In(t.loc)
 	t.nsec = ti.Nanosecond()
 	t.sec = ti.Second()
 	t.min = ti.Minute()
