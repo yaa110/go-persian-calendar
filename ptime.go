@@ -840,6 +840,7 @@ func (t Time) ZoneOffset(f ...string) string {
 //		m                minute [0-59]
 //		ss               2-digits representation of seconds [00-59]
 //		s                seconds [0-59]
+//		n				 hour name (e.g. صبح)
 //		ns               nanoseconds
 //		S                3-digits representation of milliseconds (e.g. 001)
 //		z                the name of location
@@ -876,6 +877,7 @@ func (t Time) Format(format string) string {
 		"h", strconv.Itoa(modifyHour(t.Hour12(), 12)),
 		"mm", fmt.Sprintf("%02d", t.min),
 		"m", strconv.Itoa(t.min),
+		"n", t.HourName(),
 		"ns", strconv.Itoa(t.nsec),
 		"ss", fmt.Sprintf("%02d", t.sec),
 		"s", strconv.Itoa(t.sec),
@@ -899,6 +901,7 @@ func (t Time) Format(format string) string {
 //		_2          right justified two character day (e.g.  7)
 //		Mon         weekday (e.g. شنبه)
 //		Monday      weekday (e.g. شنبه)
+//		Morning		hour name (e.g. صبح)
 //		03          two digit 12 hour format (e.g. 03)
 //		3           one digit 12 hour format (e.g. 3)
 //		15          two digit 24 hour format (e.g. 15)
@@ -926,6 +929,7 @@ func (t Time) TimeFormat(format string) string {
 		"Jan", "{MMM}",
 		"Monday", "{WD}",
 		"Mon", "{W}",
+		"Morning", "{n}",
 		".000000000", "{ns}",
 		".000000", "{ms}",
 		".000", "{mls}",
@@ -971,6 +975,7 @@ func (t Time) TimeFormat(format string) string {
 		"{D}", strconv.Itoa(t.day),
 		"{WD}", t.wday.String(),
 		"{W}", t.wday.Short(),
+		"{n}", t.HourName(),
 		"{HH}", fmt.Sprintf("%02d", t.hour),
 		"{hh}", fmt.Sprintf("%02d", t.Hour12()),
 		"{h}", strconv.Itoa(t.Hour12()),
