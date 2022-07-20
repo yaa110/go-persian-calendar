@@ -148,6 +148,17 @@ var sdays = [7]string{
 	"ج",
 }
 
+var hourNames = []string{
+	"نیمه‌شب",
+	"سحر",
+	"صبح",
+	"قبل از ظهر",
+	"ظهر",
+	"بعد از ظهر",
+	"عصر",
+	"شب",
+}
+
 //  {days, leap_days, days_before_start}
 var pMonthCount = [12][3]int{
 	{31, 31, 0},   // Farvardin
@@ -555,6 +566,21 @@ func (t Time) Second() int {
 // Nanosecond returns the nanoseconds offset of t in the range [0, 999999999].
 func (t Time) Nanosecond() int {
 	return t.nsec
+}
+
+// HourName returns the name of that part of the day.
+// [0,3)   -> midnight
+// [3,6)   -> dawn
+// [6,9)  -> morning
+// [9,12)  -> before noon
+// [12,15) -> noon
+// [15,18) -> afternoon
+// [18,21) -> evening
+// [21,24) -> night
+func (t Time) HourName() string {
+	which := t.hour / 3
+
+	return hourNames[which]
 }
 
 // Location returns a pointer to time.Location of t.
