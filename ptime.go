@@ -26,6 +26,9 @@ type Weekday int
 // A AmPm specifies the 12-Hour marker.
 type AmPm int
 
+// A DayTime represents a part of the day based on hour.
+type DayTime int
+
 // A Time represents a moment in time in Persian (Jalali) Calendar.
 type Time struct {
 	year  int
@@ -88,6 +91,18 @@ const (
 	Pm
 )
 
+// List of day times.
+const (
+	Midnight DayTime = iota
+	Dawn
+	Morning
+	BeforeNoon
+	Noon
+	AfterNoon
+	Evening
+	Night
+)
+
 var amPm = [2]string{
 	"قبل از ظهر",
 	"بعد از ظهر",
@@ -148,7 +163,7 @@ var sdays = [7]string{
 	"ج",
 }
 
-var hourNames = []string{
+var daytimes = []string{
 	"نیمه‌شب",
 	"سحر",
 	"صبح",
@@ -226,6 +241,11 @@ func (a AmPm) String() string {
 // Short returns the Persian short name of 12-Hour marker.
 func (a AmPm) Short() string {
 	return sAmPm[a]
+}
+
+// String returns the Persian name of day time.
+func (d DayTime) String() string {
+	return daytimes[d]
 }
 
 // New converts Gregorian calendar to Persian calendar and
@@ -568,19 +588,17 @@ func (t Time) Nanosecond() int {
 	return t.nsec
 }
 
-// HourName returns the name of that part of the day.
+// DayTime returns the dayTime of that part of the day.
 // [0,3)   -> midnight
 // [3,6)   -> dawn
-// [6,9)  -> morning
+// [6,9)   -> morning
 // [9,12)  -> before noon
 // [12,15) -> noon
 // [15,18) -> afternoon
 // [18,21) -> evening
 // [21,24) -> night
-func (t Time) HourName() string {
-	which := t.hour / 3
-
-	return hourNames[which]
+func (t Time) DayTime() DayTime {
+	return DayTime(t.hour / 3)
 }
 
 // Location returns a pointer to time.Location of t.
@@ -877,7 +895,7 @@ func (t Time) Format(format string) string {
 		"h", strconv.Itoa(modifyHour(t.Hour12(), 12)),
 		"mm", fmt.Sprintf("%02d", t.min),
 		"m", strconv.Itoa(t.min),
-		"n", t.HourName(),
+		"n", t.DayTime().String(),
 		"ns", strconv.Itoa(t.nsec),
 		"ss", fmt.Sprintf("%02d", t.sec),
 		"s", strconv.Itoa(t.sec),
@@ -975,7 +993,7 @@ func (t Time) TimeFormat(format string) string {
 		"{D}", strconv.Itoa(t.day),
 		"{WD}", t.wday.String(),
 		"{W}", t.wday.Short(),
-		"{n}", t.HourName(),
+		"{n}", t.DayTime().String(),
 		"{HH}", fmt.Sprintf("%02d", t.hour),
 		"{hh}", fmt.Sprintf("%02d", t.Hour12()),
 		"{h}", strconv.Itoa(t.Hour12()),

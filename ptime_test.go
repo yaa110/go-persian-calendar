@@ -40,9 +40,9 @@ type dayFunctions struct {
 	day2 pdate
 }
 
-type dayPartName struct {
-	hour []int
-	name string
+type dayTime struct {
+	hour    []int
+	daytime DayTime
 }
 
 var monthPersianNames = []pMonthName{
@@ -143,15 +143,15 @@ var dayFunctionsSlice = []dayFunctions{
 	},
 }
 
-var dayPartNames = []dayPartName{
-	{[]int{0, 1, 2}, "نیمه‌شب"},
-	{[]int{3, 4, 5}, "سحر"},
-	{[]int{6, 7, 8}, "صبح"},
-	{[]int{9, 10, 11}, "قبل از ظهر"},
-	{[]int{12, 13, 14}, "ظهر"},
-	{[]int{15, 16, 17}, "بعد از ظهر"},
-	{[]int{18, 19, 20}, "عصر"},
-	{[]int{21, 22, 23}, "شب"},
+var daytimes = []dayTime{
+	{[]int{0, 1, 2}, Midnight},
+	{[]int{3, 4, 5}, Dawn},
+	{[]int{6, 7, 8}, Morning},
+	{[]int{9, 10, 11}, BeforeNoon},
+	{[]int{12, 13, 14}, Noon},
+	{[]int{15, 16, 17}, AfterNoon},
+	{[]int{18, 19, 20}, Evening},
+	{[]int{21, 22, 23}, Night},
 }
 
 func TestPersianMonthName(t *testing.T) {
@@ -558,12 +558,12 @@ func TestTimeFormat(t *testing.T) {
 }
 
 func TestHourName(t *testing.T) {
-	for _, dayPart := range dayPartNames {
+	for _, dayPart := range daytimes {
 		for _, hour := range dayPart.hour {
 			ti := Date(1394, 7, 2, hour, 7, 8, 52065090, Iran())
-			hourName := ti.HourName()
-			if hourName != dayPart.name {
-				t.Error("Expected ", dayPart.name, "got ", hourName)
+			daytime := ti.DayTime()
+			if daytime != dayPart.daytime {
+				t.Error("Expected ", dayPart.daytime, "got ", daytime)
 			}
 		}
 	}
