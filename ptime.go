@@ -919,7 +919,7 @@ func (t Time) Format(format string) string {
 //		_2          right justified two character day (e.g.  7)
 //		Mon         weekday (e.g. شنبه)
 //		Monday      weekday (e.g. شنبه)
-//		Morning		hour name (e.g. صبح)
+//		Morning     hour name (e.g. صبح)
 //		03          two digit 12 hour format (e.g. 03)
 //		3           one digit 12 hour format (e.g. 3)
 //		15          two digit 24 hour format (e.g. 15)
