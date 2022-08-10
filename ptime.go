@@ -164,7 +164,7 @@ var sdays = [7]string{
 }
 
 var daytimes = []string{
-	"نیمه‌شب",
+	"نیمه\u200cشب",
 	"سحر",
 	"صبح",
 	"قبل از ظهر",
@@ -174,7 +174,7 @@ var daytimes = []string{
 	"شب",
 }
 
-//  {days, leap_days, days_before_start}
+// {days, leap_days, days_before_start}
 var pMonthCount = [12][3]int{
 	{31, 31, 0},   // Farvardin
 	{31, 31, 31},  // Ordibehesht
@@ -383,6 +383,7 @@ func (t *Time) SetUnix(sec, nsec int64) {
 }
 
 // norm returns nhi, nlo such that
+//
 //	hi * base + lo == nhi * base + nlo
 //	0 <= nlo < base
 func norm(hi, lo, base int) (int, int) {
@@ -400,6 +401,7 @@ func norm(hi, lo, base int) (int, int) {
 }
 
 // norm returns nhi, nlo such that
+//
 //	hi * base + lo == nhi * base + nlo
 //	0 <= nlo < base
 func normDay(hi, lo, base int) (int, int) {
@@ -827,77 +829,77 @@ func (t Time) ZoneOffset(f ...string) string {
 
 // Format returns the formatted representation of t.
 //
-//		yyyy, yyy, y     year (e.g. 1394)
-//		yy               2-digits representation of year (e.g. 94)
-//		MMM              the Persian name of month (e.g. فروردین)
-//		MMI              the Dari name of month (e.g. حمل)
-//		MM               2-digits representation of month (e.g. 01)
-//		M                month (e.g. 1)
-//		rw               remaining weeks of year
-//		w                week of year
-//		RW               remaining weeks of month
-//		W                week of month
-//		RD               remaining days of year
-//		D                day of year
-//		rd               remaining days of month
-//		dd               2-digits representation of day (e.g. 01)
-//		d                day (e.g. 1)
-//		E                the Persian name of weekday (e.g. شنبه)
-//		e                the Persian short name of weekday (e.g. ش)
-//		A                the Persian name of 12-Hour marker (e.g. قبل از ظهر)
-//		a                the Persian short name of 12-Hour marker (e.g. ق.ظ)
-//		HH               2-digits representation of hour [00-23]
-//		H                hour [0-23]
-//		kk               2-digits representation of hour [01-24]
-//		k                hour [1-24]
-//		hh               2-digits representation of hour [01-12]
-//		h                hour [1-12]
-//		KK               2-digits representation of hour [00-11]
-//		K                hour [0-11]
-//		mm               2-digits representation of minute [00-59]
-//		m                minute [0-59]
-//		ss               2-digits representation of seconds [00-59]
-//		s                seconds [0-59]
-//		n				 hour name (e.g. صبح)
-//		ns               nanoseconds
-//		S                3-digits representation of milliseconds (e.g. 001)
-//		z                the name of location
-//		Z                zone offset (e.g. +03:30)
+//	yyyy, yyy, y     year (e.g. 1394)
+//	yy               2-digits representation of year (e.g. 94)
+//	MMM              the Persian name of month (e.g. فروردین)
+//	MMI              the Dari name of month (e.g. حمل)
+//	MM               2-digits representation of month (e.g. 01)
+//	M                month (e.g. 1)
+//	rw               remaining weeks of year
+//	w                week of year
+//	RW               remaining weeks of month
+//	W                week of month
+//	RD               remaining days of year
+//	D                day of year
+//	rd               remaining days of month
+//	dd               2-digits representation of day (e.g. 01)
+//	d                day (e.g. 1)
+//	E                the Persian name of weekday (e.g. شنبه)
+//	e                the Persian short name of weekday (e.g. ش)
+//	A                the Persian name of 12-Hour marker (e.g. قبل از ظهر)
+//	a                the Persian short name of 12-Hour marker (e.g. ق.ظ)
+//	HH               2-digits representation of hour [00-23]
+//	H                hour [0-23]
+//	kk               2-digits representation of hour [01-24]
+//	k                hour [1-24]
+//	hh               2-digits representation of hour [01-12]
+//	h                hour [1-12]
+//	KK               2-digits representation of hour [00-11]
+//	K                hour [0-11]
+//	mm               2-digits representation of minute [00-59]
+//	m                minute [0-59]
+//	ss               2-digits representation of seconds [00-59]
+//	s                seconds [0-59]
+//	n				 hour name (e.g. صبح)
+//	ns               nanoseconds
+//	S                3-digits representation of milliseconds (e.g. 001)
+//	z                the name of location
+//	Z                zone offset (e.g. +03:30)
 func (t Time) Format(format string) string {
 	r := strings.NewReplacer(
 		"yyyy", strconv.Itoa(t.year),
 		"yyy", strconv.Itoa(t.year),
-		"yy", strconv.Itoa(t.year)[2:],
-		"y", strconv.Itoa(t.year),
 		"MMM", t.month.String(),
 		"MMI", t.month.Dari(),
+		"yy", strconv.Itoa(t.year)[2:],
 		"MM", fmt.Sprintf("%02d", t.month),
-		"M", strconv.Itoa(int(t.month)),
 		"rw", strconv.Itoa(t.RYearWeek()),
-		"w", strconv.Itoa(t.YearWeek()),
-		"W", strconv.Itoa(t.MonthWeek()),
 		"RD", strconv.Itoa(t.RYearDay()),
-		"D", strconv.Itoa(t.YearDay()),
 		"rd", strconv.Itoa(t.RMonthDay()),
 		"dd", fmt.Sprintf("%02d", t.day),
+		"HH", fmt.Sprintf("%02d", t.hour),
+		"KK", fmt.Sprintf("%02d", t.Hour12()),
+		"kk", fmt.Sprintf("%02d", modifyHour(t.hour, 24)),
+		"hh", fmt.Sprintf("%02d", modifyHour(t.Hour12(), 12)),
+		"mm", fmt.Sprintf("%02d", t.min),
+		"ns", strconv.Itoa(t.nsec),
+		"ss", fmt.Sprintf("%02d", t.sec),
+		"y", strconv.Itoa(t.year),
+		"M", strconv.Itoa(int(t.month)),
+		"w", strconv.Itoa(t.YearWeek()),
+		"W", strconv.Itoa(t.MonthWeek()),
+		"D", strconv.Itoa(t.YearDay()),
 		"d", strconv.Itoa(t.day),
 		"E", t.wday.String(),
 		"e", t.wday.Short(),
 		"A", t.AmPm().String(),
 		"a", t.AmPm().Short(),
-		"HH", fmt.Sprintf("%02d", t.hour),
 		"H", strconv.Itoa(t.hour),
-		"KK", fmt.Sprintf("%02d", t.Hour12()),
 		"K", strconv.Itoa(t.Hour12()),
-		"kk", fmt.Sprintf("%02d", modifyHour(t.hour, 24)),
 		"k", strconv.Itoa(modifyHour(t.hour, 24)),
-		"hh", fmt.Sprintf("%02d", modifyHour(t.Hour12(), 12)),
 		"h", strconv.Itoa(modifyHour(t.Hour12(), 12)),
-		"mm", fmt.Sprintf("%02d", t.min),
 		"m", strconv.Itoa(t.min),
 		"n", t.DayTime().String(),
-		"ns", strconv.Itoa(t.nsec),
-		"ss", fmt.Sprintf("%02d", t.sec),
 		"s", strconv.Itoa(t.sec),
 		"S", fmt.Sprintf("%03d", t.nsec/1e6),
 		"z", t.loc.String(),
@@ -908,39 +910,39 @@ func (t Time) Format(format string) string {
 
 // TimeFormat formats in standard time format.
 //
-//		2006        four digit year (e.g. 1399)
-//		06          two digit year (e.g. 99)
-//		01          two digit month (e.g. 01)
-//		1           one digit month (e.g. 1)
-//		Jan         month name (e.g. آذر)
-//		January     month name (e.g. آذر)
-//		02          two digit day (e.g. 07)
-//		2           one digit day (e.g. 7)
-//		_2          right justified two character day (e.g.  7)
-//		Mon         weekday (e.g. شنبه)
-//		Monday      weekday (e.g. شنبه)
-//		Morning     hour name (e.g. صبح)
-//		03          two digit 12 hour format (e.g. 03)
-//		3           one digit 12 hour format (e.g. 3)
-//		15          two digit 24 hour format (e.g. 15)
-//		04          two digit minute (e.g. 03)
-//		4           one digit minute (e.g. 03)
-//		05          two digit minute (e.g. 09)
-//		5           one digit minute (e.g. 9)
-//		.000        millisecond (e.g. .120)
-//		.000000     microsecond (e.g. .123400)
-//		.000000000  nanosecond (e.g. .123456000)
-//		.999        trailing zeros removed millisecond (e.g. .12)
-//		.999999     trailing zeros removed microsecond (e.g. .1234)
-//		.999999999  trailing zeros removed nanosecond (e.g. .123456)
-//		PM          full 12-Hour marker (e.g. قبل از ظهر)
-//		pm          short 12-Hour marker (e.g. ق.ظ)
-//		MST         the name of location
-//		-0700       zone offset (e.g. +0330)
-//		-07         zone offset (e.g. +03)
-//		-07:00      zone offset (e.g. +03:30)
-//		Z0700       zone offset (e.g. +0330)
-//		Z07:00      zone offset (e.g. +03:30)
+//	2006        four digit year (e.g. 1399)
+//	06          two digit year (e.g. 99)
+//	01          two digit month (e.g. 01)
+//	1           one digit month (e.g. 1)
+//	Jan         month name (e.g. آذر)
+//	January     month name (e.g. آذر)
+//	02          two digit day (e.g. 07)
+//	2           one digit day (e.g. 7)
+//	_2          right justified two character day (e.g.  7)
+//	Mon         weekday (e.g. شنبه)
+//	Monday      weekday (e.g. شنبه)
+//	Morning     hour name (e.g. صبح)
+//	03          two digit 12 hour format (e.g. 03)
+//	3           one digit 12 hour format (e.g. 3)
+//	15          two digit 24 hour format (e.g. 15)
+//	04          two digit minute (e.g. 03)
+//	4           one digit minute (e.g. 03)
+//	05          two digit minute (e.g. 09)
+//	5           one digit minute (e.g. 9)
+//	.000        millisecond (e.g. .120)
+//	.000000     microsecond (e.g. .123400)
+//	.000000000  nanosecond (e.g. .123456000)
+//	.999        trailing zeros removed millisecond (e.g. .12)
+//	.999999     trailing zeros removed microsecond (e.g. .1234)
+//	.999999999  trailing zeros removed nanosecond (e.g. .123456)
+//	PM          full 12-Hour marker (e.g. قبل از ظهر)
+//	pm          short 12-Hour marker (e.g. ق.ظ)
+//	MST         the name of location
+//	-0700       zone offset (e.g. +0330)
+//	-07         zone offset (e.g. +03)
+//	-07:00      zone offset (e.g. +03:30)
+//	Z0700       zone offset (e.g. +0330)
+//	Z07:00      zone offset (e.g. +03:30)
 func (t Time) TimeFormat(format string) string {
 	initializer := []string{
 		"January", "{MMMM}",
@@ -981,9 +983,19 @@ func (t Time) TimeFormat(format string) string {
 	r := strings.NewReplacer(initializer...)
 	formatted := r.Replace(format)
 
+	nsec := strconv.Itoa(t.nsec)
+	if len(nsec) < 6 {
+		nsec = fmt.Sprintf("%06d", t.nsec)
+	}
+
+	year := strconv.Itoa(t.year)
+	if len(year) < 4 {
+		year = fmt.Sprintf("%04d", t.year)
+	}
+
 	params := []string{
-		"{YYYY}", strconv.Itoa(t.year),
-		"{YY}", strconv.Itoa(t.year)[2:],
+		"{YYYY}", year,
+		"{YY}", year[2:],
 		"{MMMM}", t.locMonthName(),
 		"{MMM}", t.locMonthName(),
 		"{MM}", fmt.Sprintf("%02d", int(t.month)),
@@ -1001,12 +1013,12 @@ func (t Time) TimeFormat(format string) string {
 		"{m}", strconv.Itoa(t.min),
 		"{ss}", fmt.Sprintf("%02d", t.sec),
 		"{s}", strconv.Itoa(t.sec),
-		"{ns}", "." + strconv.Itoa(t.nsec),
-		"{ms}", "." + strconv.Itoa(t.nsec)[:6],
-		"{mls}", "." + strconv.Itoa(t.nsec)[:3],
-		"{nst}", strings.TrimRight("."+strconv.Itoa(t.nsec), "0"),
-		"{mst}", strings.TrimRight("."+strconv.Itoa(t.nsec)[:6], "0"),
-		"{mlst}", strings.TrimRight("."+strconv.Itoa(t.nsec)[:3], "0"),
+		"{ns}", "." + nsec,
+		"{ms}", "." + nsec[:6],
+		"{mls}", "." + nsec[:3],
+		"{nst}", strings.TrimRight("."+nsec, "0"),
+		"{mst}", strings.TrimRight("."+nsec[:6], "0"),
+		"{mlst}", strings.TrimRight("."+nsec[:3], "0"),
 		"{AFTER}", t.AmPm().String(),
 		"{after}", t.AmPm().Short(),
 		"{LOC}", t.loc.String(),
