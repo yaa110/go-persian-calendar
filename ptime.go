@@ -809,21 +809,16 @@ func (t Time) ZoneOffset(f ...string) string {
 		}
 	}
 
-	sign := "+"
-	if offset < 0 {
-		sign = "-"
-	}
-
 	h := offset / 3600
 	m := (offset - h*3600) / 60
 
 	switch format {
 	case "-0700", "Z0700":
-		return fmt.Sprintf("%s%02d%02d", sign, h, m)
+		return fmt.Sprintf("%+02d%02d", h, m)
 	case "-07":
-		return fmt.Sprintf("%s%02d", sign, h)
+		return fmt.Sprintf("%+02d", h)
 	default:
-		return fmt.Sprintf("%s%02d:%02d", sign, h, m)
+		return fmt.Sprintf("%+03d:%02d", h, m)
 	}
 }
 
