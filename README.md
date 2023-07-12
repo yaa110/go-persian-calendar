@@ -1,6 +1,6 @@
 # Go Persian Calendar
 
-[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/yaa110/go-persian-calendar) [![Test and Build](https://github.com/yaa110/go-persian-calendar/workflows/Test%20and%20Build/badge.svg)](https://github.com/yaa110/go-persian-calendar/actions?query=workflow%3A"Test+and+Build") [![goreportcard](https://img.shields.io/badge/go%20report-A%2B-brightgreen.svg)](http://goreportcard.com/report/yaa110/go-persian-calendar) [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/yaa110/go-persian-calendar/blob/master/LICENSE)
+[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://pkg.go.dev/github.com/yaa110/go-persian-calendar) [![Test and Build](https://github.com/yaa110/go-persian-calendar/workflows/Test%20and%20Build/badge.svg)](https://github.com/yaa110/go-persian-calendar/actions?query=workflow%3A"Test+and+Build") [![goreportcard](https://img.shields.io/badge/go%20report-A%2B-brightgreen.svg)](http://goreportcard.com/report/yaa110/go-persian-calendar) [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/yaa110/go-persian-calendar/blob/master/LICENSE)
 
 **Go Persian Calendar** provides functionality for conversion among Persian (Solar Hijri) and Gregorian calendars. A Julian calendar is used as an interface for all conversions. The package name is `ptime` and it is compatible with the package [time](https://golang.org/pkg/time). All months are available with both Iranian and Dari Persian names. This source code is licensed under MIT license that can be found in the LICENSE file.
 
@@ -177,10 +177,10 @@ fmt.Println(pt.TimeFormat("2 Jan 2006")) // output: 2 مهر 1394
 // Z07:00      zone offset (e.g. +03:30)
 ```
 
-## Limitation
+## Limitations
 
 - The minimum value of Gregorian year is 1097, otherwise a zero instance of `ptime.Time` is returned.
 
 ## Documentation
 
-Use [GoDoc documentation](https://godoc.org/github.com/yaa110/go-persian-calendar) for more information about methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `ptime.AmPm`.
+Please read [the documentation](https://pkg.go.dev/github.com/yaa110/go-persian-calendar) for more information about methods and functionality available for `ptime.Time`, `ptime.Month`, `ptime.Weekday` and `ptime.AmPm`.
