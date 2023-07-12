@@ -1,0 +1,16 @@
+on: [push, pull_request]
+name: Test and Build
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "1.16"
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build
+        run: go build
+      - name: Test and Coverage
+        run: go test ./... -v -covermode=count

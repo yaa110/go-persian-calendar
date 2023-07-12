@@ -465,6 +465,34 @@ func TestWeeks(t *testing.T) {
 	}
 }
 
+func TestPanic(t *testing.T) {
+	defer func() {
+		if r := recover(); r != nil {
+			t.Error("the test has paniced")
+		}
+	}()
+
+	for y := 0; y < 3000; y++ {
+		for m := 0; m < 13; m++ {
+			for d := 0; d < 32; d++ {
+				ti := time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.Local)
+				pt := New(ti)
+				_ = pt.Month().String()
+			}
+		}
+	}
+
+	pt := Time{}
+	_ = pt.String()
+}
+
+func TestZero(t *testing.T) {
+	pt := New(time.Time{})
+	if !pt.IsZero() {
+		t.Error("time must be zero")
+	}
+}
+
 func TestFormat(t *testing.T) {
 	ti := Date(1394, Mehr, 2, 12, 59, 59, 50260050, Iran())
 

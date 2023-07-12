@@ -215,45 +215,98 @@ func (t Time) String() string {
 
 // Dari returns the Dari name of the month.
 func (m Month) Dari() string {
-	return dmonths[m-1]
+	switch {
+	case m < 1:
+		return dmonths[0]
+	case m > 11:
+		return dmonths[11]
+	default:
+		return dmonths[m-1]
+	}
 }
 
 // String returns the Persian name of the month.
 func (m Month) String() string {
-	return months[m-1]
+	switch {
+	case m < 1:
+		return months[0]
+	case m > 11:
+		return months[11]
+	default:
+		return months[m-1]
+	}
 }
 
 // String returns the Persian name of the day in week.
 func (d Weekday) String() string {
-	return days[d]
+	switch {
+	case d < 0:
+		return days[0]
+	case d > 6:
+		return days[6]
+	default:
+		return days[d]
+	}
 }
 
 // Short returns the Persian short name of the day in week.
 func (d Weekday) Short() string {
-	return sdays[d]
+	switch {
+	case d < 0:
+		return sdays[0]
+	case d > 6:
+		return sdays[6]
+	default:
+		return sdays[d]
+	}
 }
 
 // String returns the Persian name of 12-Hour marker.
 func (a AmPm) String() string {
-	return amPm[a]
+	switch {
+	case a < 0:
+		return amPm[0]
+	case a > 1:
+		return amPm[1]
+	default:
+		return amPm[a]
+	}
 }
 
 // Short returns the Persian short name of 12-Hour marker.
 func (a AmPm) Short() string {
-	return sAmPm[a]
+	switch {
+	case a < 0:
+		return sAmPm[0]
+	case a > 1:
+		return sAmPm[1]
+	default:
+		return sAmPm[a]
+	}
 }
 
 // String returns the Persian name of day time.
 func (d DayTime) String() string {
-	return daytimes[d]
+	switch {
+	case d < 0:
+		return daytimes[0]
+	case d > 7:
+		return daytimes[7]
+	default:
+		return daytimes[d]
+	}
 }
 
 // New converts Gregorian calendar to Persian calendar and
 //
-// returns a new instance of Time corresponding to the time of t.
+// returns a new instance of Time corresponding to the time of t or a zero instance of time if Gregorian year is less than 1097.
 //
 // t is an instance of time.Time in Gregorian calendar.
 func New(t time.Time) Time {
+	if t.Year() < 1097 {
+		return Time{}
+	}
+
 	pt := new(Time)
 	pt.SetTime(t)
 
@@ -290,7 +343,12 @@ func (t Time) Time() time.Time {
 		year = 4*k + n + i - 4716
 	}
 
-	return time.Date(year, time.Month(month), day, t.hour, t.min, t.sec, t.nsec, t.loc)
+	loc := t.loc
+	if loc == nil {
+		loc = time.Local
+	}
+
+	return time.Date(year, time.Month(month), day, t.hour, t.min, t.sec, t.nsec, loc)
 }
 
 // Date returns a new instance of Time.
@@ -299,10 +357,10 @@ func (t Time) Time() time.Time {
 //
 // hour, min minute, sec seconds, nsec nanoseconds offsets represent a moment in time.
 //
-// loc is a pointer to time.Location and must not be nil.
+// loc is a pointer to time.Location, if loc is nil then the local time is used.
 func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Location) Time {
 	if loc == nil {
-		panic("ptime: the Location must not be nil in call to Date")
+		loc = time.Local
 	}
 
 	t := new(Time)
@@ -439,6 +497,13 @@ func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *ti
 	// Normalize month, overflowing into year.
 	m := int(month) - 1
 	year, m = norm(year, m, 12)
+
+	if m < 0 {
+		m = 0
+	} else if m > 11 {
+		m = 11
+	}
+
 	if isLeap(year) {
 		m, day = normDay(m, day, pMonthCount[m][1])
 	} else {
@@ -523,6 +588,11 @@ func (t *Time) At(hour, min, sec, nsec int) {
 	t.SetMinute(min)
 	t.SetSecond(sec)
 	t.SetNanosecond(nsec)
+}
+
+// IsZero returns true if t is zero time instance
+func (t Time) IsZero() bool {
+	return t == Time{}
 }
 
 // Unix returns the number of seconds since January 1, 1970 UTC.
@@ -610,7 +680,14 @@ func (t Time) Location() *time.Location {
 
 // YearDay returns the day of year of t.
 func (t Time) YearDay() int {
-	return pMonthCount[t.month-1][2] + t.day
+	m := t.month - 1
+	if m < 0 {
+		m = 0
+	} else if m > 11 {
+		m = 11
+	}
+
+	return pMonthCount[m][2] + t.day
 }
 
 // RYearDay returns the number of remaining days of the year of t.
@@ -633,7 +710,15 @@ func (t Time) RMonthDay() int {
 	if t.IsLeap() {
 		i = 1
 	}
-	return pMonthCount[t.month-1][i] - t.day
+
+	m := t.month - 1
+	if m < 0 {
+		m = 0
+	} else if m > 11 {
+		m = 11
+	}
+
+	return pMonthCount[m][i] - t.day
 }
 
 // BeginningOfWeek returns a new instance of Time representing the first day of the week of t.
@@ -685,7 +770,15 @@ func (t Time) LastMonthDay() Time {
 	if t.IsLeap() {
 		i = 1
 	}
-	ld := pMonthCount[t.month-1][i]
+
+	m := t.month - 1
+	if m < 0 {
+		m = 0
+	} else if m > 11 {
+		m = 11
+	}
+
+	ld := pMonthCount[m][i]
 	if ld == t.day {
 		return t
 	}
@@ -861,12 +954,17 @@ func (t Time) ZoneOffset(f ...string) string {
 //	z                the name of location
 //	Z                zone offset (e.g. +03:30)
 func (t Time) Format(format string) string {
+	year := strconv.Itoa(t.year)
+	if len(year) < 4 {
+		year = fmt.Sprintf("%04d", t.year)
+	}
+
 	r := strings.NewReplacer(
-		"yyyy", strconv.Itoa(t.year),
-		"yyy", strconv.Itoa(t.year),
+		"yyyy", year,
+		"yyy", year,
 		"MMM", t.month.String(),
 		"MMI", t.month.Dari(),
-		"yy", strconv.Itoa(t.year)[2:],
+		"yy", year[2:],
 		"MM", fmt.Sprintf("%02d", t.month),
 		"rw", strconv.Itoa(t.RYearWeek()),
 		"RD", strconv.Itoa(t.RYearDay()),
@@ -879,7 +977,7 @@ func (t Time) Format(format string) string {
 		"mm", fmt.Sprintf("%02d", t.min),
 		"ns", strconv.Itoa(t.nsec),
 		"ss", fmt.Sprintf("%02d", t.sec),
-		"y", strconv.Itoa(t.year),
+		"y", year,
 		"M", strconv.Itoa(int(t.month)),
 		"w", strconv.Itoa(t.YearWeek()),
 		"W", strconv.Itoa(t.MonthWeek()),
@@ -1069,7 +1167,15 @@ func (t *Time) normDay() {
 	if t.IsLeap() {
 		i = 1
 	}
-	between(&t.day, 1, pMonthCount[t.month-1][i])
+
+	m := t.month - 1
+	if m < 0 {
+		m = 0
+	} else if m > 11 {
+		m = 11
+	}
+
+	between(&t.day, 1, pMonthCount[m][i])
 }
 
 func modifyHour(value, max int) int {
