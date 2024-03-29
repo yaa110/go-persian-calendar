@@ -573,13 +573,14 @@ func (t *Time) SetNanosecond(nsec int) {
 // In sets the location of t.
 //
 // loc is a pointer to time.Location and must not be nil.
-func (t *Time) In(loc *time.Location) {
+func (t Time) In(loc *time.Location) Time {
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to In")
 	}
 
 	t.loc = loc
 	t.resetWeekday()
+	return t
 }
 
 // At sets the hour, min minute, sec second and nsec nanoseconds offsets of t.

@@ -214,6 +214,17 @@ func TestLocations(t *testing.T) {
 			"got", Afghanistan().String(),
 		)
 	}
+
+	loc, _ := time.LoadLocation("Asia/Baghdad")
+	expected := loc.String()
+	actual := Now().In(loc).Location().String()
+	if actual != expected {
+		t.Error(
+			"For", "Baghdad",
+			"expected", expected,
+			"got", actual,
+		)
+	}
 }
 
 func TestPersianToGregorian(t *testing.T) {
