@@ -1250,3 +1250,11 @@ func getWeekday(wd time.Weekday) Weekday {
 func (t *Time) resetWeekday() {
 	t.wday = getWeekday(t.Time().Weekday())
 }
+
+func (t Time) IsFuture() bool {
+	return t.Unix() > time.Now().Unix()
+}
+
+func (t Time) IsPast() bool {
+	return t.Unix() < time.Now().Unix()
+}
