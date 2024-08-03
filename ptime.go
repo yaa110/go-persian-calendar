@@ -402,31 +402,26 @@ func (t *Time) SetTime(ti time.Time) {
 		jdn = 367*gy - ((7 * (gy + 5001 + ((gm - 9) / 7))) / 4) + ((275 * gm) / 9) + gd + 1729777
 	}
 
-	dep := jdn - getJdn(475, 1, 1)
-	cyc := dep / 1029983
-	rem := dep % 1029983
+	const julianDayToShamsiOffset = 1365393
+	sd := jdn - julianDayToShamsiOffset
 
-	var ycyc int
-	if rem == 1029982 {
-		ycyc = 2820
+	year = -1595 + 33*(sd/12053)
+	sd %= 12053
+	year += 4 * (sd / 1461)
+	sd %= 1461
+
+	if sd > 365 {
+		year += (sd - 1) / 365
+		sd = (sd - 1) % 365
+	}
+
+	if sd < 186 {
+		month = 1 + (sd / 31)
+		day = 1 + (sd % 31)
 	} else {
-		a := rem / 366
-		ycyc = (2134*a+2816*(rem%366)+2815)/1028522 + a + 1
+		month = 7 + ((sd - 186) / 30)
+		day = 1 + ((sd - 186) % 30)
 	}
-
-	year = ycyc + 2820*cyc + 474
-	if year <= 0 {
-		year = year - 1
-	}
-
-	var dy = float64(jdn - getJdn(year, 1, 1) + 1)
-	if dy <= 186 {
-		month = int(math.Ceil(dy / 31.0))
-	} else {
-		month = int(math.Ceil((dy - 6) / 30.0))
-	}
-
-	day = jdn - getJdn(year, month, 1) + 1
 
 	t.year = year
 	t.month = Month(month)
