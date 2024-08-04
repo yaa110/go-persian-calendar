@@ -1205,21 +1205,35 @@ func divider(num, den int) int {
 }
 
 func getJdn(year int, month int, day int) int {
-	base := year - 473
-	if year >= 0 {
-		base--
-	}
+	const shamsiToJulianOffset = 1365392
+	const leapYearCycle = 33
+	const leapYearContribution = 8
+	const leapYearAdjustmentNumerator = 3
+	const leapYearAdjustmentDenominator = 4
+	const daysInMonthBeforeAdjustment = 186
+	const daysInFirstSixMonths = 31
+	const daysInNextSixMonths = 30
 
-	epy := 474 + (base % 2820)
+	// Calculate adjusted Shamsi year
+	adjustedShamsiYear := year + 1595
 
-	var md int
-	if month <= 7 {
-		md = (month - 1) * 31
+	// Calculate leap year contribution count
+	leapYearContributionCount := (adjustedShamsiYear/leapYearCycle)*leapYearContribution +
+		((adjustedShamsiYear%leapYearCycle + leapYearAdjustmentNumerator) / leapYearAdjustmentDenominator)
+
+	// Calculate day of the year
+	var dayOfYear int
+	if month < 7 {
+		dayOfYear = (month - 1) * daysInFirstSixMonths
 	} else {
-		md = (month-1)*30 + 6
+		dayOfYear = (month-7)*daysInNextSixMonths + daysInMonthBeforeAdjustment
 	}
 
-	return day + md + (epy*682-110)/2816 + (epy-1)*365 + base/2820*1029983 + 1948320
+	// Compute the Julian Day Number
+	jdn := shamsiToJulianOffset + 365*adjustedShamsiYear +
+		leapYearContributionCount + dayOfYear + day
+
+	return jdn
 }
 
 func getWeekday(wd time.Weekday) Weekday {
