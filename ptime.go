@@ -313,41 +313,28 @@ func New(t time.Time) Time {
 	return *pt
 }
 
-// Time converts Persian date to Gregorian date and returns a new instance of time.Time
+// Time converts the Shamsi (Solar Hijri) testDate stored in the Time struct to the corresponding
+// Gregorian testDate and returns it as a Go time.Time object.
 func (t Time) Time() time.Time {
 	var year, month, day int
 
-	jdn := getJdn(t.year, int(t.month), t.day)
+	// Convert the Shamsi testDate to the corresponding Julian Day Number (JDN)
+	jdn := convertShamsiToJDN(t.year, int(t.month), t.day)
 
-	if jdn > 2299160 {
-		l := jdn + 68569
-		n := 4 * l / 146097
-		l = l - (146097*n+3)/4
-		i := 4000 * (l + 1) / 1461001
-		l = l - 1461*i/4 + 31
-		j := 80 * l / 2447
-		day = l - 2447*j/80
-		l = j / 11
-		month = j + 2 - 12*l
-		year = 100*(n-49) + i + l
+	// Convert the JDN to a Gregorian testDate
+	if jdn > gregorianReformJulianDay {
+		year, month, day = convertJDNToGregorianPostReform(jdn)
 	} else {
-		j := jdn + 1402
-		k := (j - 1) / 1461
-		l := j - 1461*k
-		n := (l-1)/365 - l/1461
-		i := l - 365*n + 30
-		j = 80 * i / 2447
-		day = i - 2447*j/80
-		i = j / 11
-		month = j + 2 - 12*i
-		year = 4*k + n + i - 4716
+		year, month, day = convertJDNToGregorianPreReform(jdn)
 	}
 
+	// Use the location stored in the Time struct, or default to the local time zone
 	loc := t.loc
 	if loc == nil {
 		loc = time.Local
 	}
 
+	// Return the corresponding time.Time object
 	return time.Date(year, time.Month(month), day, t.hour, t.min, t.sec, t.nsec, loc)
 }
 
@@ -381,7 +368,10 @@ func Now() Time {
 	return New(time.Now())
 }
 
-// SetTime sets t to the time of ti.
+// SetTime sets the time and testDate for the `Time` struct based on the input `time.Time` object.
+// This function converts a Gregorian testDate (as provided by `ti`) to the Shamsi (Persian) calendar.
+// It first calculates the Julian Day Number (JDN), a continuous count of days since the beginning
+// of the Julian Period, and then converts this JDN to a Shamsi testDate.
 func (t *Time) SetTime(ti time.Time) {
 	var year, month, day int
 
@@ -396,32 +386,13 @@ func (t *Time) SetTime(ti time.Time) {
 	gy, gmm, gd := ti.Date()
 	gm := int(gmm)
 
-	if gy > 1582 || (gy == 1582 && gm > 10) || (gy == 1582 && gm == 10 && gd > 14) {
-		jdn = ((1461 * (gy + 4800 + ((gm - 14) / 12))) / 4) + ((367 * (gm - 2 - 12*((gm-14)/12))) / 12) - ((3 * ((gy + 4900 + ((gm - 14) / 12)) / 100)) / 4) + gd - 32075
+	if isAfterGregorianReform(gy, gm, gd) {
+		jdn = convertGregorianPostReformToJDN(gy, gm, gd)
 	} else {
-		jdn = 367*gy - ((7 * (gy + 5001 + ((gm - 9) / 7))) / 4) + ((275 * gm) / 9) + gd + 1729777
+		jdn = convertGregorianPreReformToJDN(gy, gm, gd)
 	}
 
-	const julianDayToShamsiOffset = 1365393
-	sd := jdn - julianDayToShamsiOffset
-
-	year = -1595 + 33*(sd/12053)
-	sd %= 12053
-	year += 4 * (sd / 1461)
-	sd %= 1461
-
-	if sd > 365 {
-		year += (sd - 1) / 365
-		sd = (sd - 1) % 365
-	}
-
-	if sd < 186 {
-		month = 1 + (sd / 31)
-		day = 1 + (sd % 31)
-	} else {
-		month = 7 + ((sd - 186) / 30)
-		day = 1 + ((sd - 186) % 30)
-	}
+	year, month, day = convertJDNToShamsi(jdn)
 
 	t.year = year
 	t.month = Month(month)
@@ -1202,38 +1173,6 @@ func divider(num, den int) int {
 		return num % den
 	}
 	return num - ((((num + 1) / den) - 1) * den)
-}
-
-func getJdn(year int, month int, day int) int {
-	const shamsiToJulianOffset = 1365392
-	const leapYearCycle = 33
-	const leapYearContribution = 8
-	const leapYearAdjustmentNumerator = 3
-	const leapYearAdjustmentDenominator = 4
-	const daysInMonthBeforeAdjustment = 186
-	const daysInFirstSixMonths = 31
-	const daysInNextSixMonths = 30
-
-	// Calculate adjusted Shamsi year
-	adjustedShamsiYear := year + 1595
-
-	// Calculate leap year contribution count
-	leapYearContributionCount := (adjustedShamsiYear/leapYearCycle)*leapYearContribution +
-		((adjustedShamsiYear%leapYearCycle + leapYearAdjustmentNumerator) / leapYearAdjustmentDenominator)
-
-	// Calculate day of the year
-	var dayOfYear int
-	if month < 7 {
-		dayOfYear = (month - 1) * daysInFirstSixMonths
-	} else {
-		dayOfYear = (month-7)*daysInNextSixMonths + daysInMonthBeforeAdjustment
-	}
-
-	// Compute the Julian Day Number
-	jdn := shamsiToJulianOffset + 365*adjustedShamsiYear +
-		leapYearContributionCount + dayOfYear + day
-
-	return jdn
 }
 
 func getWeekday(wd time.Weekday) Weekday {
