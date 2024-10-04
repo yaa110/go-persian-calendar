@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // A Month specifies a month of the year starting from Farvardin = 1.
@@ -163,7 +164,7 @@ var sdays = [7]string{
 	"ج",
 }
 
-var daytimes = []string{
+var daytimes = [8]string{
 	"نیمه\u200cشب",
 	"سحر",
 	"صبح",
@@ -647,14 +648,15 @@ func (t Time) Location() *time.Location {
 
 // YearDay returns the day of year of t.
 func (t Time) YearDay() int {
-	m := t.month - 1
-	if m < 0 {
-		m = 0
-	} else if m > 11 {
-		m = 11
+	m := int(t.month - 1)
+	switch { // isInBounds()
+	case m < 0:
+		return pMonthCount[0][2] + t.day
+	case m > 11:
+		return pMonthCount[11][2] + t.day
+	default:
+		return pMonthCount[m][2] + t.day
 	}
-
-	return pMonthCount[m][2] + t.day
 }
 
 // RYearDay returns the number of remaining days of the year of t.
@@ -679,13 +681,15 @@ func (t Time) RMonthDay() int {
 	}
 
 	m := t.month - 1
-	if m < 0 {
-		m = 0
-	} else if m > 11 {
-		m = 11
-	}
 
-	return pMonthCount[m][i] - t.day
+	switch { // isInBounds()
+	case m < 0:
+		return pMonthCount[0][i] - t.day
+	case m > 11:
+		return pMonthCount[11][i] - t.day
+	default:
+		return pMonthCount[m][i] - t.day
+	}
 }
 
 // BeginningOfWeek returns a new instance of Time representing the first day of the week of t.
@@ -921,51 +925,230 @@ func (t Time) ZoneOffset(f ...string) string {
 //	z                the name of location
 //	Z                zone offset (e.g. +03:30)
 func (t Time) Format(format string) string {
-	year := strconv.Itoa(t.year)
-	if len(year) < 4 {
-		year = fmt.Sprintf("%04d", t.year)
+	if format == "" {
+		return ""
 	}
 
-	r := strings.NewReplacer(
-		"yyyy", year,
-		"yyy", year,
-		"MMM", t.month.String(),
-		"MMI", t.month.Dari(),
-		"yy", year[2:],
-		"MM", fmt.Sprintf("%02d", t.month),
-		"rw", strconv.Itoa(t.RYearWeek()),
-		"RD", strconv.Itoa(t.RYearDay()),
-		"rd", strconv.Itoa(t.RMonthDay()),
-		"dd", fmt.Sprintf("%02d", t.day),
-		"HH", fmt.Sprintf("%02d", t.hour),
-		"KK", fmt.Sprintf("%02d", t.Hour12()),
-		"kk", fmt.Sprintf("%02d", modifyHour(t.hour, 24)),
-		"hh", fmt.Sprintf("%02d", modifyHour(t.Hour12(), 12)),
-		"mm", fmt.Sprintf("%02d", t.min),
-		"ns", strconv.Itoa(t.nsec),
-		"ss", fmt.Sprintf("%02d", t.sec),
-		"y", year,
-		"M", strconv.Itoa(int(t.month)),
-		"w", strconv.Itoa(t.YearWeek()),
-		"W", strconv.Itoa(t.MonthWeek()),
-		"D", strconv.Itoa(t.YearDay()),
-		"d", strconv.Itoa(t.day),
-		"E", t.wday.String(),
-		"e", t.wday.Short(),
-		"A", t.AmPm().String(),
-		"a", t.AmPm().Short(),
-		"H", strconv.Itoa(t.hour),
-		"K", strconv.Itoa(t.Hour12()),
-		"k", strconv.Itoa(modifyHour(t.hour, 24)),
-		"h", strconv.Itoa(modifyHour(t.Hour12(), 12)),
-		"m", strconv.Itoa(t.min),
-		"n", t.DayTime().String(),
-		"s", strconv.Itoa(t.sec),
-		"S", fmt.Sprintf("%03d", t.nsec/1e6),
-		"z", t.loc.String(),
-		"Z", t.ZoneOffset(),
+	var (
+		i  int
+		sb strings.Builder
 	)
-	return r.Replace(format)
+
+	sb.Grow(2 * len(format)) // double the format len, the formatted value likely to be longer than format
+
+	writeD2 := func(v int) {
+		if v < 10 {
+			sb.WriteByte('0')
+		}
+
+		sb.WriteString(strconv.Itoa(v))
+	}
+
+	writeD3 := func(v int) {
+		switch {
+		case v >= 100: // noop
+		case v >= 10:
+			sb.WriteByte('0')
+		case v >= 0:
+			sb.WriteString("00")
+		}
+
+		sb.WriteString(strconv.Itoa(v))
+	}
+
+	writeD4 := func(v int) {
+		switch {
+		case v >= 1000: // noop
+		case v >= 100:
+			sb.WriteByte('0')
+		case v >= 10:
+			sb.WriteString("00")
+		case v >= 0:
+			sb.WriteString("000")
+		}
+
+		sb.WriteString(strconv.Itoa(v))
+	}
+
+	// peek returns next character
+	peek := func() byte {
+		j := i + 1
+
+		if j < 0 || j >= len(format) { // IsInBounds()
+			return 0
+		}
+
+		return format[j]
+	}
+
+	for {
+		if i < 0 || i >= len(format) { // isSliceInBounds()
+			break
+		}
+
+		current := format[i:]
+
+		switch format[i] {
+		case 'A':
+			sb.WriteString(t.AmPm().String())
+			i++
+		case 'D':
+			sb.WriteString(strconv.Itoa(t.YearDay()))
+			i++
+		case 'E':
+			sb.WriteString(t.wday.String())
+			i++
+		case 'H':
+			if peek() == 'H' { // HH
+				writeD2(t.hour)
+				i += 2
+			} else { // H
+				sb.WriteString(strconv.Itoa(t.hour))
+				i++
+			}
+		case 'K':
+			if peek() == 'K' { // KK
+				writeD2(t.Hour12())
+				i += 2
+			} else { // K
+				sb.WriteString(strconv.Itoa(t.Hour12()))
+				i++
+			}
+		case 'M':
+			switch {
+			default: // M
+				sb.WriteString(strconv.Itoa(int(t.month)))
+				i++
+			case strings.HasPrefix(current, "MMM"):
+				sb.WriteString(t.month.String())
+				i += 3
+			case strings.HasPrefix(current, "MMI"):
+				sb.WriteString(t.month.Dari())
+				i += 3
+			case peek() == 'M': // MM
+				writeD2(int(t.month))
+				i += 2
+			}
+		case 'R':
+			if peek() == 'D' { // RD
+				sb.WriteString(strconv.Itoa(t.RYearDay()))
+				i += 2
+			} else { // R
+				sb.WriteByte('R')
+				i++
+			}
+		case 'S':
+			writeD3(t.nsec / 1e6)
+			i++
+		case 'W':
+			sb.WriteString(strconv.Itoa(t.MonthWeek()))
+			i++
+		case 'Z':
+			sb.WriteString(t.ZoneOffset())
+			i++
+		case 'a':
+			sb.WriteString(t.AmPm().Short())
+			i++
+		case 'd':
+			if peek() == 'd' { // dd
+				writeD2(t.day)
+				i += 2
+			} else { // d
+				sb.WriteString(strconv.Itoa(t.day))
+				i++
+			}
+		case 'e':
+			sb.WriteString(t.wday.Short())
+			i++
+		case 'h':
+			if peek() == 'h' { // hh
+				writeD2(modifyHour(t.Hour12(), 12))
+				i += 2
+			} else { // h
+				sb.WriteString(strconv.Itoa(modifyHour(t.Hour12(), 12)))
+				i++
+			}
+		case 'k':
+			if peek() == 'k' { // kk
+				writeD2(modifyHour(t.hour, 24))
+				i += 2
+			} else { // k
+				sb.WriteString(strconv.Itoa(modifyHour(t.hour, 24)))
+				i++
+			}
+		case 'm':
+			if peek() == 'm' { // mm
+				writeD2(t.min)
+				i += 2
+			} else { // m
+				sb.WriteString(strconv.Itoa(t.min))
+				i++
+			}
+		case 'n':
+			if peek() == 's' { // ns
+				sb.WriteString(strconv.Itoa(t.nsec))
+				i += 2
+			} else { // n
+				sb.WriteString(t.DayTime().String())
+				i++
+			}
+		case 'r':
+			switch peek() {
+			default: // r
+				sb.WriteByte('r')
+				i++
+			case 'w': // rw
+				sb.WriteString(strconv.Itoa(t.RYearWeek()))
+				i += 2
+			case 'd': // rd
+				sb.WriteString(strconv.Itoa(t.RMonthDay()))
+				i += 2
+			}
+		case 's':
+			if peek() == 's' { // ss
+				writeD2(t.sec)
+				i += 2
+			} else { // s
+				sb.WriteString(strconv.Itoa(t.sec))
+				i++
+			}
+		case 'w':
+			sb.WriteString(strconv.Itoa(t.YearWeek()))
+			i++
+		case 'y':
+			switch {
+			default: // y
+				writeD4(t.year)
+				i++
+			case strings.HasPrefix(current, "yyyy"):
+				writeD4(t.year)
+				i += 4
+			case strings.HasPrefix(current, "yyy"):
+				writeD4(t.year)
+				i += 3
+			case peek() == 'y': // yy
+				switch s := strconv.Itoa(t.year); len(s) {
+				default:
+					sb.WriteString(s[len(s)-2:])
+				case 1:
+					sb.WriteString("0" + s)
+				case 2:
+					sb.WriteString(s)
+				}
+
+				i += 2
+			}
+		case 'z':
+			sb.WriteString(t.loc.String())
+			i++
+		default:
+			r, n := utf8.DecodeRuneInString(current)
+			sb.WriteRune(r)
+			i += n
+		}
+	}
+
+	return sb.String()
 }
 
 // TimeFormat formats in standard time format.
