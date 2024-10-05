@@ -264,14 +264,11 @@ func (d Weekday) Short() string {
 
 // String returns the Persian name of 12-Hour marker.
 func (a AmPm) String() string {
-	switch {
-	case a < 0:
+	if a <= 0 { // Am
 		return amPm[0]
-	case a > 1:
-		return amPm[1]
-	default:
-		return amPm[a]
 	}
+
+	return amPm[1] // Pm
 }
 
 // Short returns the Persian short name of 12-Hour marker.
@@ -605,12 +602,11 @@ func (t Time) Hour() int {
 
 // Hour12 returns the hour of t in the range [0, 11].
 func (t Time) Hour12() int {
-	h := t.hour
-	if h >= 12 {
-		h -= 12
+	if t.hour >= 12 {
+		return t.hour - 12
 	}
 
-	return h
+	return t.hour
 }
 
 // Minute returns the minute offset of t in the range [0, 59].
@@ -835,11 +831,10 @@ func isLeap(year int) bool {
 
 // AmPm returns the 12-Hour marker of t.
 func (t Time) AmPm() AmPm {
-	m := Am
 	if t.hour > 12 || (t.hour == 12 && (t.min > 0 || t.sec > 0)) {
-		m = Pm
+		return Pm
 	}
-	return m
+	return Am
 }
 
 // Zone returns the zone name and its offset in seconds east of UTC of t.
@@ -1330,7 +1325,7 @@ func (t *Time) normDay() {
 
 func modifyHour(value, max int) int {
 	if value == 0 {
-		value = max
+		return max
 	}
 	return value
 }
