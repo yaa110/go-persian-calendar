@@ -2,6 +2,7 @@ package ptime_test
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 	"time"
 
@@ -606,4 +607,16 @@ func TestHourName(t *testing.T) {
 			}
 		}
 	}
+}
+
+func BenchmarkFormat(b *testing.B) {
+	now := Now()
+
+	var s string
+
+	for i := 0; i < b.N; i++ {
+		s = now.Format("A D E H HH K KK MM MMM MMI MM RD R S W Z a dd d e hh h kk k mm m ns nr rw rd ss s w y yyyy yyy yy z")
+	}
+
+	runtime.KeepAlive(s)
 }
