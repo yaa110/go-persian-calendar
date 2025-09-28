@@ -1,0 +1,37 @@
+version: "2"
+run:
+  issues-exit-code: 1
+  tests: true
+  allow-parallel-runners: false
+output:
+  formats:
+    tab:
+      path: stdout
+      print-linter-name: true
+      colors: false
+  path-prefix: ""
+linters:
+  default: all
+  disable:
+    - cyclop
+    - depguard
+    - dupl
+    - exhaustruct
+    - funlen
+    - gochecknoglobals
+    - gocognit
+    - goconst
+    - gocyclo
+    - lll
+    - maintidx
+    - mnd
+    - nonamedreturns
+    - nlreturn
+    - paralleltest
+    - recvcheck
+    - varnamelen
+    - wsl
+    - wsl_v5
+formatters:
+  enable:
+    - gofmt

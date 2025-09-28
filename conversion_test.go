@@ -1,3 +1,4 @@
+//nolint:testpackage
 package ptime
 
 import (
@@ -17,7 +18,6 @@ func TestCalculateJDNToGregorian(t *testing.T) {
 					tc.gregorianDate.year, tc.gregorianDate.month, tc.gregorianDate.day, tc.julianDay, calculatedJDN)
 			}
 		})
-
 	}
 }
 
@@ -39,7 +39,6 @@ func TestCalculateGregorianToJDN(t *testing.T) {
 				t.Errorf("Test failed for testDate %d: expected Day %d, got %d\n", tc.julianDay, tc.gregorianDate.day, day)
 			}
 		})
-
 	}
 }
 
@@ -61,7 +60,6 @@ func TestCalculateJDNToShamsi(t *testing.T) {
 				t.Errorf("Test failed for testDate %d: expected Day %d, got %d\n", tc.julianDay, tc.shamsiDate.day, day)
 			}
 		})
-
 	}
 }
 
@@ -77,14 +75,13 @@ func TestCalculateShamsiToJDN(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 type testDate struct {
 	year, month, day int
 }
 
-// also these test cases where calculated by hand and the reference of time.ir to check for validation of them
+// also these test cases where calculated by hand and the reference of time.ir to check for validation of them.
 var julianToShamsiMapping = []struct {
 	julianDay  int
 	shamsiDate testDate

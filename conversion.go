@@ -1,6 +1,6 @@
 package ptime
 
-// (October 15, 1582)
+// gregorianReformJulianDay shows October 15, 1582.
 const gregorianReformJulianDay = 2299160
 
 // isAfterGregorianReform checks if the testDate is after the Gregorian calendar reform (October 15, 1582).
@@ -96,10 +96,12 @@ func convertJDNToGregorianPostReform(jdn int) (year, month, day int) {
 
 	// Calculate century
 	century := 4 * offsetJDN / julianDayOf400Years
+	//nolint:gocritic
 	offsetJDN = offsetJDN - (julianDayOf400Years*century+3)/4
 
 	// Calculate year
 	yearBase := 4000 * (offsetJDN + 1) / julianDay4000YearCycleDayOffset
+
 	offsetJDN = offsetJDN - daysInFourYearCycle*yearBase/4 + 31
 
 	// Calculate month and day
