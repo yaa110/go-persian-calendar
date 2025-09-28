@@ -90,6 +90,14 @@ fmt.Println(pt.YearWeek()) // output: 46
 
 // Get the number of remaining weeks of the year
 fmt.Println(pt.RYearWeek()) // output: 6
+
+// Compare times
+pt1 := ptime.Date(1394, ptime.Mehr, 2, 12, 0, 0, 0, ptime.Iran())
+pt2 := ptime.Date(1394, ptime.Mehr, 3, 12, 0, 0, 0, ptime.Iran())
+fmt.Println(pt1.Before(pt2))  // output: true
+fmt.Println(pt1.After(pt2))   // output: false
+fmt.Println(pt1.Equal(pt2))   // output: false
+fmt.Println(pt1.Compare(pt2)) // output: -1
 ```
 
 5- Format the time.
