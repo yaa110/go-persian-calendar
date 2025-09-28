@@ -1,16 +1,20 @@
 on: [push, pull_request]
 name: Test and Build
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Go
-        uses: actions/setup-go@v2
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.20"
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Build
-        run: go build
-      - name: Test and Coverage
-        run: go test ./... -v -covermode=count
+      - uses: actions/checkout@v5
+      - run: go build
+      - run: make test
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.25"
+      - uses: actions/checkout@v5
+      - run: make lint

@@ -6,22 +6,22 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/yaa110/go-persian-calendar"
+	ptime "github.com/yaa110/go-persian-calendar"
 )
 
 type pMonthName struct {
-	month Month
+	month ptime.Month
 	name  string
 }
 
 type amPmName struct {
-	ap   AmPm
+	ap   ptime.AmPm
 	name string
 }
 
 type comparisonTest struct {
 	name    string
-	t1, t2  Time
+	t1, t2  ptime.Time
 	before  bool
 	after   bool
 	equal   bool
@@ -30,7 +30,7 @@ type comparisonTest struct {
 
 type pdate struct {
 	year  int
-	month Month
+	month ptime.Month
 	day   int
 }
 
@@ -52,123 +52,123 @@ type dayFunctions struct {
 
 type dayTime struct {
 	hour    []int
-	daytime DayTime
+	daytime ptime.DayTime
 }
 
 var monthPersianNames = []pMonthName{
-	{Farvardin, "فروردین"},
-	{Ordibehesht, "اردیبهشت"},
-	{Khordad, "خرداد"},
-	{Tir, "تیر"},
-	{Mordad, "مرداد"},
-	{Shahrivar, "شهریور"},
-	{Mehr, "مهر"},
-	{Aban, "آبان"},
-	{Azar, "آذر"},
-	{Dey, "دی"},
-	{Bahman, "بهمن"},
-	{Esfand, "اسفند"},
+	{ptime.Farvardin, "فروردین"},
+	{ptime.Ordibehesht, "اردیبهشت"},
+	{ptime.Khordad, "خرداد"},
+	{ptime.Tir, "تیر"},
+	{ptime.Mordad, "مرداد"},
+	{ptime.Shahrivar, "شهریور"},
+	{ptime.Mehr, "مهر"},
+	{ptime.Aban, "آبان"},
+	{ptime.Azar, "آذر"},
+	{ptime.Dey, "دی"},
+	{ptime.Bahman, "بهمن"},
+	{ptime.Esfand, "اسفند"},
 }
 
 var monthDariNames = []pMonthName{
-	{Hamal, "حمل"},
-	{Sur, "ثور"},
-	{Jauza, "جوزا"},
-	{Saratan, "سرطان"},
-	{Asad, "اسد"},
-	{Sonboleh, "سنبله"},
-	{Mizan, "میزان"},
-	{Aqrab, "عقرب"},
-	{Qos, "قوس"},
-	{Jady, "جدی"},
-	{Dolv, "دلو"},
-	{Hut, "حوت"},
+	{ptime.Hamal, "حمل"},
+	{ptime.Sur, "ثور"},
+	{ptime.Jauza, "جوزا"},
+	{ptime.Saratan, "سرطان"},
+	{ptime.Asad, "اسد"},
+	{ptime.Sonboleh, "سنبله"},
+	{ptime.Mizan, "میزان"},
+	{ptime.Aqrab, "عقرب"},
+	{ptime.Qos, "قوس"},
+	{ptime.Jady, "جدی"},
+	{ptime.Dolv, "دلو"},
+	{ptime.Hut, "حوت"},
 }
 
 var amPmNames = []amPmName{
-	{Am, "قبل از ظهر"},
-	{Pm, "بعد از ظهر"},
+	{ptime.Am, "قبل از ظهر"},
+	{ptime.Pm, "بعد از ظهر"},
 }
 
 var amPmSNames = []amPmName{
-	{Am, "ق.ظ"},
-	{Pm, "ب.ظ"},
+	{ptime.Am, "ق.ظ"},
+	{ptime.Pm, "ب.ظ"},
 }
 
 var dateConversions = []dateConversion{
 	{
-		persian:   pdate{1383, Tir, 15},
+		persian:   pdate{1383, ptime.Tir, 15},
 		gregorian: gdate{2004, time.July, 5},
 	},
 	{
-		persian:   pdate{1394, Dey, 11},
+		persian:   pdate{1394, ptime.Dey, 11},
 		gregorian: gdate{2016, time.January, 1},
 	},
 	{
-		persian:   pdate{1394, Esfand, 9},
+		persian:   pdate{1394, ptime.Esfand, 9},
 		gregorian: gdate{2016, time.February, 28},
 	},
 	{
-		persian:   pdate{1394, Esfand, 11},
+		persian:   pdate{1394, ptime.Esfand, 11},
 		gregorian: gdate{2016, time.March, 1},
 	},
 	{
-		persian:   pdate{1394, Esfand, 29},
+		persian:   pdate{1394, ptime.Esfand, 29},
 		gregorian: gdate{2016, time.March, 19},
 	},
 	{
-		persian:   pdate{1395, Farvardin, 1},
+		persian:   pdate{1395, ptime.Farvardin, 1},
 		gregorian: gdate{2016, time.March, 20},
 	},
 	{
-		persian:   pdate{1395, Farvardin, 2},
+		persian:   pdate{1395, ptime.Farvardin, 2},
 		gregorian: gdate{2016, time.March, 21},
 	},
 	{
-		persian:   pdate{1395, Farvardin, 3},
+		persian:   pdate{1395, ptime.Farvardin, 3},
 		gregorian: gdate{2016, time.March, 22},
 	},
 	{
-		persian:   pdate{1395, Dey, 11},
+		persian:   pdate{1395, ptime.Dey, 11},
 		gregorian: gdate{2016, time.December, 31},
 	},
 }
 
 var dayFunctionsSlice = []dayFunctions{
 	{
-		pdate{1394, Tir, 31},
-		pdate{1394, Mordad, 1},
+		pdate{1394, ptime.Tir, 31},
+		pdate{1394, ptime.Mordad, 1},
 	},
 	{
-		pdate{1394, Esfand, 29},
-		pdate{1395, Farvardin, 1},
+		pdate{1394, ptime.Esfand, 29},
+		pdate{1395, ptime.Farvardin, 1},
 	},
 	{
-		pdate{1395, Esfand, 29},
-		pdate{1395, Esfand, 30},
+		pdate{1395, ptime.Esfand, 29},
+		pdate{1395, ptime.Esfand, 30},
 	},
 	{
-		pdate{1395, Ordibehesht, 12},
-		pdate{1395, Ordibehesht, 13},
+		pdate{1395, ptime.Ordibehesht, 12},
+		pdate{1395, ptime.Ordibehesht, 13},
 	},
 }
 
 var daytimes = []dayTime{
-	{[]int{0, 1, 2}, Midnight},
-	{[]int{3, 4, 5}, Dawn},
-	{[]int{6, 7, 8}, Morning},
-	{[]int{9, 10, 11}, BeforeNoon},
-	{[]int{12, 13, 14}, Noon},
-	{[]int{15, 16, 17}, AfterNoon},
-	{[]int{18, 19, 20}, Evening},
-	{[]int{21, 22, 23}, Night},
+	{[]int{0, 1, 2}, ptime.Midnight},
+	{[]int{3, 4, 5}, ptime.Dawn},
+	{[]int{6, 7, 8}, ptime.Morning},
+	{[]int{9, 10, 11}, ptime.BeforeNoon},
+	{[]int{12, 13, 14}, ptime.Noon},
+	{[]int{15, 16, 17}, ptime.AfterNoon},
+	{[]int{18, 19, 20}, ptime.Evening},
+	{[]int{21, 22, 23}, ptime.Night},
 }
 
 var comparisonTests = []comparisonTest{
 	{
 		name:    "same time equal",
-		t1:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
-		t2:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
+		t1:      ptime.Date(1394, ptime.Mehr, 2, 12, 0, 0, 0, ptime.Iran()),
+		t2:      ptime.Date(1394, ptime.Mehr, 2, 12, 0, 0, 0, ptime.Iran()),
 		before:  false,
 		after:   false,
 		equal:   true,
@@ -176,8 +176,8 @@ var comparisonTests = []comparisonTest{
 	},
 	{
 		name:    "t1 before t2 by hour",
-		t1:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
-		t2:      Date(1394, Mehr, 2, 13, 0, 0, 0, Iran()),
+		t1:      ptime.Date(1394, ptime.Mehr, 2, 12, 0, 0, 0, ptime.Iran()),
+		t2:      ptime.Date(1394, ptime.Mehr, 2, 13, 0, 0, 0, ptime.Iran()),
 		before:  true,
 		after:   false,
 		equal:   false,
@@ -185,8 +185,8 @@ var comparisonTests = []comparisonTest{
 	},
 	{
 		name:    "t1 after t2 by hour",
-		t1:      Date(1394, Mehr, 2, 13, 0, 0, 0, Iran()),
-		t2:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
+		t1:      ptime.Date(1394, ptime.Mehr, 2, 13, 0, 0, 0, ptime.Iran()),
+		t2:      ptime.Date(1394, ptime.Mehr, 2, 12, 0, 0, 0, ptime.Iran()),
 		before:  false,
 		after:   true,
 		equal:   false,
@@ -194,8 +194,8 @@ var comparisonTests = []comparisonTest{
 	},
 	{
 		name:    "t1 before t2 by day",
-		t1:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
-		t2:      Date(1394, Mehr, 3, 12, 0, 0, 0, Iran()),
+		t1:      ptime.Date(1394, ptime.Mehr, 2, 12, 0, 0, 0, ptime.Iran()),
+		t2:      ptime.Date(1394, ptime.Mehr, 3, 12, 0, 0, 0, ptime.Iran()),
 		before:  true,
 		after:   false,
 		equal:   false,
@@ -203,8 +203,8 @@ var comparisonTests = []comparisonTest{
 	},
 	{
 		name:    "t1 after t2 by day",
-		t1:      Date(1394, Mehr, 3, 12, 0, 0, 0, Iran()),
-		t2:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
+		t1:      ptime.Date(1394, ptime.Mehr, 3, 12, 0, 0, 0, ptime.Iran()),
+		t2:      ptime.Date(1394, ptime.Mehr, 2, 12, 0, 0, 0, ptime.Iran()),
 		before:  false,
 		after:   true,
 		equal:   false,
@@ -257,25 +257,27 @@ func TestAmPmShortName(t *testing.T) {
 }
 
 func TestLocations(t *testing.T) {
-	if Iran().String() != "Asia/Tehran" {
+	if ptime.Iran().String() != "Asia/Tehran" {
 		t.Error(
 			"For", "Iran",
 			"expected", "Asia/Tehran",
-			"got", Iran().String(),
+			"got", ptime.Iran().String(),
 		)
 	}
 
-	if Afghanistan().String() != "Asia/Kabul" {
+	if ptime.Afghanistan().String() != "Asia/Kabul" {
 		t.Error(
 			"For", "Afghanistan",
 			"expected", "Asia/Kabul",
-			"got", Afghanistan().String(),
+			"got", ptime.Afghanistan().String(),
 		)
 	}
 
 	loc, _ := time.LoadLocation("Asia/Baghdad")
 	expected := loc.String()
-	actual := Now().In(loc).Location().String()
+
+	actual := ptime.Now().In(loc).Location().String()
+
 	if actual != expected {
 		t.Error(
 			"For", "Baghdad",
@@ -287,7 +289,7 @@ func TestLocations(t *testing.T) {
 
 func TestPersianToGregorian(t *testing.T) {
 	for _, p := range dateConversions {
-		gt := Date(p.persian.year, p.persian.month, p.persian.day, 11, 59, 59, 0, Iran()).Time()
+		gt := ptime.Date(p.persian.year, p.persian.month, p.persian.day, 11, 59, 59, 0, ptime.Iran()).Time()
 
 		if gt.Year() != p.gregorian.year || gt.Month() != p.gregorian.month || gt.Day() != p.gregorian.day {
 			t.Error(
@@ -301,7 +303,7 @@ func TestPersianToGregorian(t *testing.T) {
 
 func TestGregorianToPersian(t *testing.T) {
 	for _, p := range dateConversions {
-		pt := New(time.Date(p.gregorian.year, p.gregorian.month, p.gregorian.day, 11, 59, 59, 0, Iran()))
+		pt := ptime.New(time.Date(p.gregorian.year, p.gregorian.month, p.gregorian.day, 11, 59, 59, 0, ptime.Iran()))
 
 		if pt.Year() != p.persian.year || pt.Month() != p.persian.month || pt.Day() != p.persian.day {
 			t.Error(
@@ -314,8 +316,10 @@ func TestGregorianToPersian(t *testing.T) {
 }
 
 func TestToUnixTimeStamp(t *testing.T) {
-	pu := Now().Unix()
+	pu := ptime.Now().Unix()
+
 	tu := time.Now().Unix()
+
 	if pu != tu {
 		t.Error(
 			"Expected", tu,
@@ -326,9 +330,9 @@ func TestToUnixTimeStamp(t *testing.T) {
 
 func TestFromUnixTimeStamp(t *testing.T) {
 	tu := time.Now().Unix()
-	now := Now()
+	now := ptime.Now()
 
-	fu := Unix(tu, int64(now.Nanosecond()))
+	fu := ptime.Unix(tu, int64(now.Nanosecond()))
 
 	if fu.String() != now.String() {
 		t.Error(
@@ -340,8 +344,10 @@ func TestFromUnixTimeStamp(t *testing.T) {
 
 func TestYesterday(t *testing.T) {
 	for _, p := range dayFunctionsSlice {
-		day := Date(p.day2.year, p.day2.month, p.day2.day, 12, 59, 59, 0, Iran())
+		day := ptime.Date(p.day2.year, p.day2.month, p.day2.day, 12, 59, 59, 0, ptime.Iran())
+
 		yesterday := day.Yesterday()
+
 		if yesterday.Year() != p.day1.year || yesterday.Month() != p.day1.month || yesterday.Day() != p.day1.day {
 			t.Error(
 				"For", fmt.Sprintf("%d %s %d", p.day2.year, p.day2.month.String(), p.day2.day),
@@ -354,8 +360,10 @@ func TestYesterday(t *testing.T) {
 
 func TestTomorrow(t *testing.T) {
 	for _, p := range dayFunctionsSlice {
-		day := Date(p.day1.year, p.day1.month, p.day1.day, 12, 59, 59, 0, Iran())
+		day := ptime.Date(p.day1.year, p.day1.month, p.day1.day, 12, 59, 59, 0, ptime.Iran())
+
 		tomorrow := day.Tomorrow()
+
 		if tomorrow.Year() != p.day2.year || tomorrow.Month() != p.day2.month || tomorrow.Day() != p.day2.day {
 			t.Error(
 				"For", fmt.Sprintf("%d %s %d", p.day1.year, p.day1.month.String(), p.day1.day),
@@ -367,19 +375,19 @@ func TestTomorrow(t *testing.T) {
 }
 
 func TestWeekday(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
+	ti := ptime.Date(1394, ptime.Mehr, 2, 12, 59, 59, 0, ptime.Iran())
 
-	if ti.Weekday() != Panjshanbeh {
+	if ti.Weekday() != ptime.Panjshanbeh {
 		t.Error(
 			"For", "Weekday()",
-			"expected", Panjshanbeh.String(),
+			"expected", ptime.Panjshanbeh.String(),
 			"got", ti.Weekday().String(),
 		)
 	}
 }
 
 func TestYearDay(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
+	ti := ptime.Date(1394, ptime.Mehr, 2, 12, 59, 59, 0, ptime.Iran())
 
 	if ti.YearDay() != 188 {
 		t.Error(
@@ -399,7 +407,7 @@ func TestYearDay(t *testing.T) {
 }
 
 func TestRMonthDay(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
+	ti := ptime.Date(1394, ptime.Mehr, 2, 12, 59, 59, 0, ptime.Iran())
 
 	if ti.RMonthDay() != 28 {
 		t.Error(
@@ -411,95 +419,95 @@ func TestRMonthDay(t *testing.T) {
 }
 
 func TestFirstLast(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
+	ti := ptime.Date(1394, ptime.Mehr, 2, 12, 59, 59, 0, ptime.Iran())
 
-	if ti.FirstMonthDay().Weekday() != Charshanbeh {
+	if ti.FirstMonthDay().Weekday() != ptime.Charshanbeh {
 		t.Error(
 			"For", "FirstMonthDay().Weekday()",
-			"expected", Charshanbeh.String(),
+			"expected", ptime.Charshanbeh.String(),
 			"got", ti.FirstMonthDay().Weekday(),
 		)
 	}
 
-	if ti.BeginningOfMonth().Weekday() != Charshanbeh {
+	if ti.BeginningOfMonth().Weekday() != ptime.Charshanbeh {
 		t.Error(
 			"For", "BeginningOfMonth().Weekday()",
-			"expected", Charshanbeh.String(),
+			"expected", ptime.Charshanbeh.String(),
 			"got", ti.BeginningOfMonth().Weekday(),
 		)
 	}
 
-	if ti.LastMonthDay().Weekday() != Panjshanbeh {
+	if ti.LastMonthDay().Weekday() != ptime.Panjshanbeh {
 		t.Error(
 			"For", "LastMonthDay().Weekday()",
-			"expected", Panjshanbeh.String(),
+			"expected", ptime.Panjshanbeh.String(),
 			"got", ti.LastMonthDay().Weekday(),
 		)
 	}
 
-	if ti.FirstYearDay().Weekday() != Shanbeh {
+	if ti.FirstYearDay().Weekday() != ptime.Shanbeh {
 		t.Error(
 			"For", "FirstYearDay().Weekday()",
-			"expected", Shanbeh.String(),
+			"expected", ptime.Shanbeh.String(),
 			"got", ti.FirstYearDay().Weekday(),
 		)
 	}
 
-	if ti.BeginningOfYear().Weekday() != Shanbeh {
+	if ti.BeginningOfYear().Weekday() != ptime.Shanbeh {
 		t.Error(
 			"For", "BeginningOfYear().Weekday()",
-			"expected", Shanbeh.String(),
+			"expected", ptime.Shanbeh.String(),
 			"got", ti.BeginningOfYear().Weekday(),
 		)
 	}
 
-	if ti.LastYearDay().Weekday() != Shanbeh {
+	if ti.LastYearDay().Weekday() != ptime.Shanbeh {
 		t.Error(
 			"For", "LastYearDay().Weekday()",
-			"expected", Shanbeh.String(),
+			"expected", ptime.Shanbeh.String(),
 			"got", ti.LastYearDay().Weekday(),
 		)
 	}
 
-	if ti.LastWeekday().Weekday() != Jomeh {
+	if ti.LastWeekday().Weekday() != ptime.Jomeh {
 		t.Error(
 			"For", "LastWeekday().Weekday()",
-			"expected", Jomeh.String(),
+			"expected", ptime.Jomeh.String(),
 			"got", ti.LastWeekday().Weekday(),
 		)
 	}
 }
 
 func TestAddDate(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
+	ti := ptime.Date(1394, ptime.Mehr, 2, 12, 59, 59, 0, ptime.Iran())
 
-	if ti.AddDate(0, 0, 20).Weekday() != Charshanbeh {
+	if ti.AddDate(0, 0, 20).Weekday() != ptime.Charshanbeh {
 		t.Error(
 			"For", "AddDate(0, 0, 20).Weekday()",
-			"expected", Charshanbeh.String(),
+			"expected", ptime.Charshanbeh.String(),
 			"got", ti.AddDate(0, 0, 20).Weekday(),
 		)
 	}
 
-	if ti.AddDate(0, 1, 0).Weekday() != Shanbeh {
+	if ti.AddDate(0, 1, 0).Weekday() != ptime.Shanbeh {
 		t.Error(
 			"For", "AddDate(0, 1, 0).Weekday()",
-			"expected", Shanbeh.String(),
+			"expected", ptime.Shanbeh.String(),
 			"got", ti.AddDate(0, 1, 0).Weekday(),
 		)
 	}
 
-	if ti.AddDate(2, 0, 0).Weekday() != Yekshanbeh {
+	if ti.AddDate(2, 0, 0).Weekday() != ptime.Yekshanbeh {
 		t.Error(
 			"For", "AddDate(2, 0, 0).Weekday()",
-			"expected", Yekshanbeh.String(),
+			"expected", ptime.Yekshanbeh.String(),
 			"got", ti.AddDate(2, 0, 0).Weekday(),
 		)
 	}
 }
 
 func TestWeeks(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 0, Iran())
+	ti := ptime.Date(1394, ptime.Mehr, 2, 12, 59, 59, 0, ptime.Iran())
 
 	if ti.YearWeek() != 27 {
 		t.Error(
@@ -544,19 +552,20 @@ func TestPanic(t *testing.T) {
 	for y := 0; y < 3000; y++ {
 		for m := 0; m < 13; m++ {
 			for d := 0; d < 32; d++ {
+				//nolint:gosmopolitan
 				ti := time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.Local)
-				pt := New(ti)
+				pt := ptime.New(ti)
 				_ = pt.Month().String()
 			}
 		}
 	}
 
-	pt := Time{}
+	pt := ptime.Time{}
 	_ = pt.String()
 }
 
 func TestZero(t *testing.T) {
-	pt := New(time.Time{})
+	pt := ptime.New(time.Time{})
 	if !pt.IsZero() {
 		t.Error("time must be zero")
 	}
@@ -605,7 +614,7 @@ func TestComparison(t *testing.T) {
 }
 
 func TestFormat(t *testing.T) {
-	ti := Date(1394, Mehr, 2, 12, 59, 59, 50260050, Iran())
+	ti := ptime.Date(1394, ptime.Mehr, 2, 12, 59, 59, 50260050, ptime.Iran())
 
 	s := ti.Format("d MMM yyyy")
 	if s != "2 مهر 1394" {
@@ -633,7 +642,7 @@ func TestFormat(t *testing.T) {
 }
 
 func TestTimeFormat(t *testing.T) {
-	ti := Date(1394, 7, 2, 14, 7, 8, 52065090, Iran())
+	ti := ptime.Date(1394, 7, 2, 14, 7, 8, 52065090, ptime.Iran())
 
 	s := ti.TimeFormat("2 Jan 2006")
 	if s != "2 مهر 1394" {
@@ -643,7 +652,8 @@ func TestTimeFormat(t *testing.T) {
 		)
 	}
 
-	tid := Date(1394, Mizan, 2, 12, 59, 59, 52065090, Afghanistan())
+	tid := ptime.Date(1394, ptime.Mizan, 2, 12, 59, 59, 52065090, ptime.Afghanistan())
+
 	s = tid.TimeFormat("2 Jan 2006")
 	if s != "2 میزان 1394" {
 		t.Error(
@@ -699,7 +709,8 @@ func TestTimeFormat(t *testing.T) {
 func TestHourName(t *testing.T) {
 	for _, dayPart := range daytimes {
 		for _, hour := range dayPart.hour {
-			ti := Date(1394, 7, 2, hour, 7, 8, 52065090, Iran())
+			ti := ptime.Date(1394, 7, 2, hour, 7, 8, 52065090, ptime.Iran())
+
 			daytime := ti.DayTime()
 			if daytime != dayPart.daytime {
 				t.Error("Expected ", dayPart.daytime, "got ", daytime)
@@ -709,7 +720,7 @@ func TestHourName(t *testing.T) {
 }
 
 func BenchmarkFormat(b *testing.B) {
-	now := Now()
+	now := ptime.Now()
 
 	var s string
 

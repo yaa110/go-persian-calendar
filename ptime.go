@@ -32,15 +32,15 @@ type DayTime int
 
 // A Time represents a moment in time in Persian (Jalali) Calendar.
 type Time struct {
-	year  int
-	month Month
-	day   int
-	hour  int
-	min   int
-	sec   int
-	nsec  int
-	loc   *time.Location
-	wday  Weekday
+	year   int
+	month  Month
+	day    int
+	hour   int
+	minute int
+	sec    int
+	nsec   int
+	loc    *time.Location
+	wday   Weekday
 }
 
 // List of months in Persian calendar.
@@ -175,7 +175,7 @@ var daytimes = [8]string{
 	"شب",
 }
 
-// {days, leap_days, days_before_start}
+// pMonthCount represents {days, leap_days, days_before_start}.
 var pMonthCount = [12][3]int{
 	{31, 31, 0},   // Farvardin
 	{31, 31, 31},  // Ordibehesht
@@ -191,7 +191,7 @@ var pMonthCount = [12][3]int{
 	{29, 30, 336}, // Esfand
 }
 
-// Iran returns a pointer to time.Location of Asia/Tehran
+// Iran returns a pointer to time.Location of Asia/Tehran.
 func Iran() *time.Location {
 	loc, err := time.LoadLocation("Asia/Tehran")
 	if err != nil {
@@ -200,7 +200,7 @@ func Iran() *time.Location {
 	return loc
 }
 
-// Afghanistan returns a pointer to time.Location of Asia/Kabul
+// Afghanistan returns a pointer to time.Location of Asia/Kabul.
 func Afghanistan() *time.Location {
 	loc, err := time.LoadLocation("Asia/Kabul")
 	if err != nil {
@@ -329,27 +329,29 @@ func (t Time) Time() time.Time {
 	// Use the location stored in the Time struct, or default to the local time zone
 	loc := t.loc
 	if loc == nil {
+		//nolint:gosmopolitan
 		loc = time.Local
 	}
 
 	// Return the corresponding time.Time object
-	return time.Date(year, time.Month(month), day, t.hour, t.min, t.sec, t.nsec, loc)
+	return time.Date(year, time.Month(month), day, t.hour, t.minute, t.sec, t.nsec, loc)
 }
 
 // Date returns a new instance of Time.
 //
 // year, month and day represent a day in Persian calendar.
 //
-// hour, min minute, sec seconds, nsec nanoseconds offsets represent a moment in time.
+// hour, minute, sec seconds, nsec nanoseconds offsets represent a moment in time.
 //
 // loc is a pointer to time.Location, if loc is nil then the local time is used.
-func Date(year int, month Month, day, hour, min, sec, nsec int, loc *time.Location) Time {
+func Date(year int, month Month, day, hour, minute, sec, nsec int, loc *time.Location) Time {
 	if loc == nil {
+		//nolint:gosmopolitan
 		loc = time.Local
 	}
 
 	t := new(Time)
-	t.Set(year, month, day, hour, min, sec, nsec, loc)
+	t.Set(year, month, day, hour, minute, sec, nsec, loc)
 
 	return *t
 }
@@ -375,7 +377,7 @@ func (t *Time) SetTime(ti time.Time) {
 
 	t.nsec = ti.Nanosecond()
 	t.sec = ti.Second()
-	t.min = ti.Minute()
+	t.minute = ti.Minute()
 	t.hour = ti.Hour()
 	t.loc = ti.Location()
 	t.wday = getWeekday(ti.Weekday())
@@ -444,18 +446,18 @@ func normDay(hi, lo, base int) (int, int) {
 //
 // year, month and day represent a day in Persian calendar.
 //
-// hour, min minute, sec seconds, nsec nanoseconds offsets represent a moment in time.
+// hour, minute, sec seconds, nsec nanoseconds offsets represent a moment in time.
 //
 // loc is a pointer to time.Location and must not be nil.
-func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *time.Location) {
+func (t *Time) Set(year int, month Month, day, hour, minute, sec, nsec int, loc *time.Location) {
 	if loc == nil {
 		panic("ptime: the Location must not be nil in call to Set")
 	}
 
 	// Normalize nsec, sec, min, hour, overflowing into day.
 	sec, nsec = norm(sec, nsec, 1e9)
-	min, sec = norm(min, sec, 60)
-	hour, min = norm(hour, min, 60)
+	minute, sec = norm(minute, sec, 60)
+	hour, minute = norm(hour, minute, 60)
 	day, hour = norm(day, hour, 24)
 
 	// Normalize month, overflowing into year.
@@ -479,7 +481,7 @@ func (t *Time) Set(year int, month Month, day, hour, min, sec, nsec int, loc *ti
 	t.month = month
 	t.day = day
 	t.hour = hour
-	t.min = min
+	t.minute = minute
 	t.sec = sec
 	t.nsec = nsec
 	t.loc = loc
@@ -517,8 +519,8 @@ func (t *Time) SetHour(hour int) {
 }
 
 // SetMinute sets the minute offset of t.
-func (t *Time) SetMinute(min int) {
-	t.min = min
+func (t *Time) SetMinute(minute int) {
+	t.minute = minute
 	t.normMinute()
 }
 
@@ -547,15 +549,15 @@ func (t Time) In(loc *time.Location) Time {
 	return t
 }
 
-// At sets the hour, min minute, sec second and nsec nanoseconds offsets of t.
-func (t *Time) At(hour, min, sec, nsec int) {
+// At sets the hour, minute, sec second and nsec nanoseconds offsets of t.
+func (t *Time) At(hour, minute, sec, nsec int) {
 	t.SetHour(hour)
-	t.SetMinute(min)
+	t.SetMinute(minute)
 	t.SetSecond(sec)
 	t.SetNanosecond(nsec)
 }
 
-// IsZero returns true if t is zero time instance
+// IsZero returns true if t is zero time instance.
 func (t Time) IsZero() bool {
 	return t == Time{}
 }
@@ -600,7 +602,7 @@ func (t Time) Date() (int, Month, int) {
 
 // Clock returns the hour, minute, seconds offsets of t.
 func (t Time) Clock() (int, int, int) {
-	return t.hour, t.min, t.sec
+	return t.hour, t.minute, t.sec
 }
 
 // Year returns the year of t.
@@ -634,7 +636,7 @@ func (t Time) Hour12() int {
 
 // Minute returns the minute offset of t in the range [0, 59].
 func (t Time) Minute() int {
-	return t.min
+	return t.minute
 }
 
 // Second returns the seconds offset of t in the range [0, 59].
@@ -648,14 +650,14 @@ func (t Time) Nanosecond() int {
 }
 
 // DayTime returns the dayTime of that part of the day.
-// [0,3)   -> midnight
-// [3,6)   -> dawn
-// [6,9)   -> morning
-// [9,12)  -> before noon
-// [12,15) -> noon
-// [15,18) -> afternoon
-// [18,21) -> evening
-// [21,24) -> night
+// [0,3)   -> midnight,
+// [3,6)   -> dawn,
+// [6,9)   -> morning,
+// [9,12)  -> before noon,
+// [12,15) -> noon,
+// [15,18) -> afternoon,
+// [18,21) -> evening,
+// [21,24) -> night.
 func (t Time) DayTime() DayTime {
 	return DayTime(t.hour / 3)
 }
@@ -712,7 +714,7 @@ func (t Time) RMonthDay() int {
 }
 
 // BeginningOfWeek returns a new instance of Time representing the first day of the week of t.
-// The time is reset to 00:00:00
+// The time is reset to 00:00:00.
 func (t Time) BeginningOfWeek() Time {
 	nt := t.AddDate(0, 0, int(Shanbeh-t.wday))
 	nt.SetHour(0)
@@ -740,7 +742,7 @@ func (t Time) LastWeekday() Time {
 }
 
 // BeginningOfMonth returns a new instance of Time representing the first day of the month of t.
-// The time is reset to 00:00:00
+// The time is reset to 00:00:00.
 func (t Time) BeginningOfMonth() Time {
 	return Date(t.year, t.month, 1, 0, 0, 0, 0, t.loc)
 }
@@ -751,7 +753,7 @@ func (t Time) FirstMonthDay() Time {
 		return t
 	}
 
-	return Date(t.year, t.month, 1, t.hour, t.min, t.sec, t.nsec, t.loc)
+	return Date(t.year, t.month, 1, t.hour, t.minute, t.sec, t.nsec, t.loc)
 }
 
 // LastMonthDay returns a new instance of Time representing the last day of the month of t.
@@ -772,11 +774,11 @@ func (t Time) LastMonthDay() Time {
 	if ld == t.day {
 		return t
 	}
-	return Date(t.year, t.month, ld, t.hour, t.min, t.sec, t.nsec, t.loc)
+	return Date(t.year, t.month, ld, t.hour, t.minute, t.sec, t.nsec, t.loc)
 }
 
 // BeginningOfYear returns a new instance of Time representing the first day of the year of t.
-// The time is reset to 00:00:00
+// The time is reset to 00:00:00.
 func (t Time) BeginningOfYear() Time {
 	return Date(t.year, Farvardin, 1, 0, 0, 0, 0, t.loc)
 }
@@ -786,7 +788,7 @@ func (t Time) FirstYearDay() Time {
 	if t.month == Farvardin && t.day == 1 {
 		return t
 	}
-	return Date(t.year, Farvardin, 1, t.hour, t.min, t.sec, t.nsec, t.loc)
+	return Date(t.year, Farvardin, 1, t.hour, t.minute, t.sec, t.nsec, t.loc)
 }
 
 // LastYearDay returns a new instance of Time representing the last day of the year of t.
@@ -799,7 +801,7 @@ func (t Time) LastYearDay() Time {
 	if t.month == Esfand && t.day == ld {
 		return t
 	}
-	return Date(t.year, Esfand, ld, t.hour, t.min, t.sec, t.nsec, t.loc)
+	return Date(t.year, Esfand, ld, t.hour, t.minute, t.sec, t.nsec, t.loc)
 }
 
 // MonthWeek returns the week of month of t.
@@ -834,7 +836,7 @@ func (t Time) Add(d time.Duration) Time {
 
 // AddDate returns a new instance of Time for t.year+years, t.month+months and t.day+days.
 func (t Time) AddDate(years, months, days int) Time {
-	t.Set(t.year+years, Month(int(t.month)+months), t.day+days, t.hour, t.min, t.sec, t.nsec, t.loc)
+	t.Set(t.year+years, Month(int(t.month)+months), t.day+days, t.hour, t.minute, t.sec, t.nsec, t.loc)
 	return t
 }
 
@@ -854,7 +856,7 @@ func isLeap(year int) bool {
 
 // AmPm returns the 12-Hour marker of t.
 func (t Time) AmPm() AmPm {
-	if t.hour > 12 || (t.hour == 12 && (t.min > 0 || t.sec > 0)) {
+	if t.hour > 12 || (t.hour == 12 && (t.minute > 0 || t.sec > 0)) {
 		return Pm
 	}
 	return Am
@@ -999,11 +1001,7 @@ func (t Time) Format(format string) string {
 		return format[j]
 	}
 
-	for {
-		if i < 0 || i >= len(format) { // isSliceInBounds()
-			break
-		}
-
+	for i >= 0 && i < len(format) {
 		current := format[i:]
 
 		switch format[i] {
@@ -1096,10 +1094,10 @@ func (t Time) Format(format string) string {
 			}
 		case 'm':
 			if peek() == 'm' { // mm
-				writeD2(t.min)
+				writeD2(t.minute)
 				i += 2
 			} else { // m
-				sb.WriteString(strconv.Itoa(t.min))
+				sb.WriteString(strconv.Itoa(t.minute))
 				i++
 			}
 		case 'n':
@@ -1270,8 +1268,8 @@ func (t Time) TimeFormat(format string) string {
 		"{HH}", fmt.Sprintf("%02d", t.hour),
 		"{hh}", fmt.Sprintf("%02d", t.Hour12()),
 		"{h}", strconv.Itoa(t.Hour12()),
-		"{mm}", fmt.Sprintf("%02d", t.min),
-		"{m}", strconv.Itoa(t.min),
+		"{mm}", fmt.Sprintf("%02d", t.minute),
+		"{m}", strconv.Itoa(t.minute),
 		"{ss}", fmt.Sprintf("%02d", t.sec),
 		"{s}", strconv.Itoa(t.sec),
 		"{ns}", "." + nsec,
@@ -1319,7 +1317,7 @@ func (t *Time) normSecond() {
 }
 
 func (t *Time) normMinute() {
-	between(&t.min, 0, 59)
+	between(&t.minute, 0, 59)
 }
 
 func (t *Time) normHour() {
@@ -1346,26 +1344,26 @@ func (t *Time) normDay() {
 	between(&t.day, 1, pMonthCount[m][i])
 }
 
-func modifyHour(value, max int) int {
+func modifyHour(value, maxHour int) int {
 	if value == 0 {
-		return max
+		return maxHour
 	}
 	return value
 }
 
-func betweenMonth(value *Month, min, max Month) {
-	if *value < min {
-		*value = min
-	} else if *value > max {
-		*value = max
+func betweenMonth(value *Month, minMonth, maxMonth Month) {
+	if *value < minMonth {
+		*value = minMonth
+	} else if *value > maxMonth {
+		*value = maxMonth
 	}
 }
 
-func between(value *int, min, max int) {
-	if *value < min {
-		*value = min
-	} else if *value > max {
-		*value = max
+func between(value *int, minVal, maxVal int) {
+	if *value < minVal {
+		*value = minVal
+	} else if *value > maxVal {
+		*value = maxVal
 	}
 }
 
