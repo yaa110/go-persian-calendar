@@ -560,6 +560,29 @@ func (t Time) IsZero() bool {
 	return t == Time{}
 }
 
+// Before reports whether the time instant t is before u.
+func (t Time) Before(u Time) bool {
+	return t.Time().Before(u.Time())
+}
+
+// After reports whether the time instant t is after u.
+func (t Time) After(u Time) bool {
+	return t.Time().After(u.Time())
+}
+
+// Equal reports whether t and u represent the same time instant.
+// Two times can be equal even if they are in different locations.
+// For example, 6:00 +0200 and 4:00 UTC are Equal.
+func (t Time) Equal(u Time) bool {
+	return t.Time().Equal(u.Time())
+}
+
+// Compare compares the time instant t with u. If t is before u, it returns -1;
+// if t is after u, it returns +1; if they're the same, it returns 0.
+func (t Time) Compare(u Time) int {
+	return t.Time().Compare(u.Time())
+}
+
 // Unix returns the number of seconds since January 1, 1970 UTC.
 func (t Time) Unix() int64 {
 	return t.Time().Unix()
