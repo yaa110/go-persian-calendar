@@ -19,6 +19,15 @@ type amPmName struct {
 	name string
 }
 
+type comparisonTest struct {
+	name    string
+	t1, t2  Time
+	before  bool
+	after   bool
+	equal   bool
+	compare int
+}
+
 type pdate struct {
 	year  int
 	month Month
@@ -153,6 +162,54 @@ var daytimes = []dayTime{
 	{[]int{15, 16, 17}, AfterNoon},
 	{[]int{18, 19, 20}, Evening},
 	{[]int{21, 22, 23}, Night},
+}
+
+var comparisonTests = []comparisonTest{
+	{
+		name:    "same time equal",
+		t1:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
+		t2:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
+		before:  false,
+		after:   false,
+		equal:   true,
+		compare: 0,
+	},
+	{
+		name:    "t1 before t2 by hour",
+		t1:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
+		t2:      Date(1394, Mehr, 2, 13, 0, 0, 0, Iran()),
+		before:  true,
+		after:   false,
+		equal:   false,
+		compare: -1,
+	},
+	{
+		name:    "t1 after t2 by hour",
+		t1:      Date(1394, Mehr, 2, 13, 0, 0, 0, Iran()),
+		t2:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
+		before:  false,
+		after:   true,
+		equal:   false,
+		compare: 1,
+	},
+	{
+		name:    "t1 before t2 by day",
+		t1:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
+		t2:      Date(1394, Mehr, 3, 12, 0, 0, 0, Iran()),
+		before:  true,
+		after:   false,
+		equal:   false,
+		compare: -1,
+	},
+	{
+		name:    "t1 after t2 by day",
+		t1:      Date(1394, Mehr, 3, 12, 0, 0, 0, Iran()),
+		t2:      Date(1394, Mehr, 2, 12, 0, 0, 0, Iran()),
+		before:  false,
+		after:   true,
+		equal:   false,
+		compare: 1,
+	},
 }
 
 func TestPersianMonthName(t *testing.T) {
@@ -502,6 +559,48 @@ func TestZero(t *testing.T) {
 	pt := New(time.Time{})
 	if !pt.IsZero() {
 		t.Error("time must be zero")
+	}
+}
+
+func TestComparison(t *testing.T) {
+	for _, tt := range comparisonTests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Test Before
+			if got := tt.t1.Before(tt.t2); got != tt.before {
+				t.Error(
+					"For", tt.name,
+					"Before expected", tt.before,
+					"got", got,
+				)
+			}
+
+			// Test After
+			if got := tt.t1.After(tt.t2); got != tt.after {
+				t.Error(
+					"For", tt.name,
+					"After expected", tt.after,
+					"got", got,
+				)
+			}
+
+			// Test Equal
+			if got := tt.t1.Equal(tt.t2); got != tt.equal {
+				t.Error(
+					"For", tt.name,
+					"Equal expected", tt.equal,
+					"got", got,
+				)
+			}
+
+			// Test Compare
+			if got := tt.t1.Compare(tt.t2); got != tt.compare {
+				t.Error(
+					"For", tt.name,
+					"Compare expected", tt.compare,
+					"got", got,
+				)
+			}
+		})
 	}
 }
 
