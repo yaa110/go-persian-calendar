@@ -3,6 +3,7 @@ package ptime_test
 import (
 	"fmt"
 	"runtime"
+	"strconv"
 	"testing"
 	"time"
 
@@ -729,4 +730,86 @@ func BenchmarkFormat(b *testing.B) {
 	}
 
 	runtime.KeepAlive(s)
+}
+
+func TestAddDateAcrossMonths(t *testing.T) {
+	cases := []struct {
+		name  string
+		start pdate
+		days  int
+		want  pdate
+	}{
+		{"issue25", pdate{1402, ptime.Khordad, 21}, 287, pdate{1403, ptime.Farvardin, 5}},
+		{"issue25_next_day", pdate{1402, ptime.Khordad, 21}, 288, pdate{1403, ptime.Farvardin, 6}},
+		{"previous_year", pdate{1402, ptime.Khordad, 21}, -365, pdate{1401, ptime.Khordad, 21}},
+		{"next_year", pdate{1402, ptime.Khordad, 21}, 365, pdate{1403, ptime.Khordad, 21}},
+		{"shorter_months", pdate{1402, ptime.Mehr, 30}, 31, pdate{1402, ptime.Azar, 1}},
+		{"previous_longer_month", pdate{1402, ptime.Mehr, 1}, -1, pdate{1402, ptime.Shahrivar, 31}},
+		{"previous_common_year", pdate{1403, ptime.Farvardin, 1}, -1, pdate{1402, ptime.Esfand, 29}},
+		{"previous_leap_year", pdate{1404, ptime.Farvardin, 1}, -1, pdate{1403, ptime.Esfand, 30}},
+		{"unchanged", pdate{1402, ptime.Khordad, 21}, 0, pdate{1402, ptime.Khordad, 21}},
+	}
+	loc := time.FixedZone("test", 3*60*60+30*60)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			start := ptime.Date(tc.start.year, tc.start.month, tc.start.day, 12, 34, 56, 123456789, loc)
+			want := ptime.Date(tc.want.year, tc.want.month, tc.want.day, 12, 34, 56, 123456789, loc)
+			got := start.AddDate(0, 0, tc.days)
+			if got.Year() != tc.want.year || got.Month() != tc.want.month || got.Day() != tc.want.day ||
+				!got.Equal(want) || got.Time().Location() != loc || got.Weekday() != want.Weekday() {
+				t.Errorf("AddDate(0, 0, %d) = %s, want %s", tc.days, got, want)
+			}
+			if start.Day() != tc.start.day || start.Month() != tc.start.month || start.Year() != tc.start.year {
+				t.Error("AddDate changed its receiver")
+			}
+		})
+	}
+}
+
+func TestDateDayOffsets(t *testing.T) {
+	cases := []struct {
+		name      string
+		year      int
+		month     ptime.Month
+		day, hour int
+		want      pdate
+	}{
+		{"day_zero", 1402, ptime.Mehr, 0, 12, pdate{1402, ptime.Shahrivar, 31}},
+		{"leap_year_overflow", 1403, ptime.Esfand, 31, 12, pdate{1404, ptime.Farvardin, 1}},
+		{"month_and_day_overflow", 1402, ptime.Month(14), 0, 12, pdate{1403, ptime.Farvardin, 31}},
+		{"clock_day_overflow", 1402, ptime.Shahrivar, 31, 36, pdate{1402, ptime.Mehr, 1}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := ptime.Date(tc.year, tc.month, tc.day, tc.hour, 34, 56, 123456789, time.UTC)
+			want := ptime.Date(tc.want.year, tc.want.month, tc.want.day, 12, 34, 56, 123456789, time.UTC)
+			if got.Year() != tc.want.year || got.Month() != tc.want.month || got.Day() != tc.want.day ||
+				!got.Equal(want) || got.Weekday() != want.Weekday() {
+				t.Errorf("Date(%d, %d, %d, %d) = %s, want %s", tc.year, tc.month, tc.day, tc.hour, got, want)
+			}
+		})
+	}
+}
+
+func TestDatePreservesValidYears(t *testing.T) {
+	const maxInt = int(^uint(0) >> 1)
+	for _, year := range []int{-10000, -2200, -1595, -1, 0, 1, 475, 476, -maxInt - 1, maxInt} {
+		t.Run(strconv.Itoa(year), func(t *testing.T) {
+			got := ptime.Date(year, ptime.Farvardin, 1, 12, 34, 56, 123456789, time.UTC)
+			if got.Year() != year || got.Month() != ptime.Farvardin || got.Day() != 1 {
+				t.Errorf("Date(%d, Farvardin, 1) = %v", year, got)
+			}
+		})
+	}
+}
+
+func TestDatePreservesNegativeDayNormalization(t *testing.T) {
+	for _, year := range []int{-2200, -1596, -1595, -1} {
+		t.Run(strconv.Itoa(year), func(t *testing.T) {
+			got := ptime.Date(year, ptime.Farvardin, 32, 12, 34, 56, 123456789, time.UTC)
+			if got.Year() != year || got.Month() != ptime.Ordibehesht || got.Day() != 1 {
+				t.Errorf("Date(%d, Farvardin, 32) = %v", year, got)
+			}
+		})
+	}
 }

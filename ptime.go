@@ -442,6 +442,34 @@ func normDay(hi, lo, base int) (int, int) {
 	return hi, lo
 }
 
+// normDate normalizes a zero-based month and day offset.
+func normDate(year, month, day int) (int, int, int) {
+	maxDay := pMonthCount[month][0]
+	if isLeap(year) {
+		maxDay = pMonthCount[month][1]
+	}
+	if day >= 1 && day <= maxDay {
+		return year, month, day
+	}
+
+	// Keep the existing normalization when the conversion arithmetic or
+	// negative-year leap convention is outside the Julian-day helper's domain.
+	const maxInt = int(^uint(0) >> 1)
+	const maxYear = (maxInt-1365392)/366 - 1595
+	if year >= 0 && year <= maxYear {
+		baseDay := convertShamsiToJDN(year, month+1, 0)
+		firstDay := convertShamsiToJDN(0, 1, 1)
+		if day >= firstDay-baseDay && day <= maxInt-baseDay {
+			year, month, day = convertJDNToShamsi(baseDay + day)
+			return year, month - 1, day
+		}
+	}
+
+	month, day = normDay(month, day, maxDay)
+	year, month = norm(year, month, 12)
+	return year, month, day
+}
+
 // Set sets t.
 //
 // year, month and day represent a day in Persian calendar.
@@ -464,18 +492,8 @@ func (t *Time) Set(year int, month Month, day, hour, minute, sec, nsec int, loc 
 	m := int(month) - 1
 	year, m = norm(year, m, 12)
 
-	if m < 0 {
-		m = 0
-	} else if m > 11 {
-		m = 11
-	}
-
-	if isLeap(year) {
-		m, day = normDay(m, day, pMonthCount[m][1])
-	} else {
-		m, day = normDay(m, day, pMonthCount[m][0])
-	}
-	year, m = norm(year, m, 12)
+	// Normalize day using calendar days, which accounts for differing month lengths.
+	year, m, day = normDate(year, m, day)
 	month = Month(m) + 1
 	t.year = year
 	t.month = month
